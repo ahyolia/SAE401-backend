@@ -1,0 +1,15 @@
+.debug {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1.1em;
+    line-height: 1.6;
+    overflow: auto;
+    padding: 1em;
+    white-space: pre-wrap;
+    position:fixed;
+    margin-top: 0;
+    margin-left: 70%;
+    width: 30%;
+    z-index:1000;
+}

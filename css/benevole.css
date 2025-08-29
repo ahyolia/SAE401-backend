@@ -1,0 +1,98 @@
+.benevole-hero {
+    background: #ededed;
+    padding: 2.5em 0 2em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.benevole-avatar {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(58,157,154,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1em;
+    overflow: hidden;
+}
+
+.benevole-avatar img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.benevole-title {
+    font-size: 1.7em;
+    color: #3A9D9A;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.benevole-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(58,157,154,0.06);
+    margin: 2em auto;
+    padding: 2em;
+    width: 90%;
+    max-width: 400px;
+}
+
+.benevole-section label {
+    font-weight: bold;
+    color: #18B76A;
+    display: block;
+    margin-top: 1.2em;
+    margin-bottom: 0.2em;
+}
+
+.benevole-section input {
+    width: 100%;
+    padding: 0.6em;
+    border: 1px solid #18B76A;
+    border-radius: 6px;
+    margin-bottom: 1em;
+    background: #f9f6f2;
+}
+
+.benevole-section button {
+    background: #3A9D9A;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.7em 2em;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 1em;
+    transition: background 0.2s;
+}
+
+.benevole-section button:hover {
+    background: #3BAFE2;
+    color: #fff;
+}
+
+.alert {
+    background-color: #4CAF50; /* Couleur verte pour un message de succès */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    display: none; /* Masqué par défaut */
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+}
+
+.alert.show {
+    display: block; /* Affichage du message */
+}

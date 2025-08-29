@@ -1,0 +1,249 @@
+main{
+    margin: 40px;
+    background: rgba(255, 255, 255, 0.50);
+    border-radius: 32px;
+    box-shadow: 0 8px 38px 0 rgba(25, 30, 99, 0.18);
+    max-width: 1600px;
+    padding: 40px 32px;
+    overflow-x: auto;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color : #e3fafa;
+    color: #333;
+    line-height: 1.6;
+
+}
+
+p{
+    margin-bottom:10px;
+}
+
+.panier-title {
+    font-size: 55px;
+    margin-bottom: 10px; /* réduit l'espace sous le titre */
+    margin-top: 0;
+    color : rgb(45, 45, 45);
+}
+
+.panier-info {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 1.5em;
+}
+
+#panier {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+#panier thead {
+    background: #faf9f9;
+}
+
+#panier th, #panier td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+    font-size: 15px;
+    margin: 100px;
+}
+
+#panier tbody tr {
+    background: rgba(255, 255, 255);
+}
+
+#panier img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Zone dédiée aux styles du panier */
+.cart .quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 16px;
+    padding: 2px 6px;
+}
+
+.cart .btn-minus,
+.cart .btn-plus {
+    border: none;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart .btn-minus {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.cart .btn-plus {
+    background: #55BDC6;
+    color: #fff;
+}
+
+.cart .btn-minus:hover {
+    background: #d0d7dc;
+}
+
+.cart .btn-plus:hover {
+    background: #44b2b2;
+}
+
+.cart .quantity-value {
+    margin: 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.cart .supprimer {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.cart .supprimer:hover {
+    background: #c0392b;
+}
+
+#actions-nonadherent {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+#actions-nonadherent .btn-secondary {
+    background: #ecf0f1;
+    color: #2c3e50;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#actions-nonadherent .btn-secondary:hover {
+    background: #d0d7dc;
+}
+
+#actions-nonadherent .btn-primary {
+    background: #55BDC6;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#actions-nonadherent .btn-primary:hover {
+    background: #44b2b2;
+}
+
+#actions-adherent {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+#actions-adherent .btn-secondary {
+    background: #ecf0f1;
+    color: #2c3e50;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#actions-adherent .btn-secondary:hover {
+    background: #d0d7dc;
+}
+
+#actions-adherent .btn-primary {
+    background: #55BDC6;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#actions-adherent .btn-primary:hover {
+    background: #44b2b2;
+}
+
+#panier-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem; /* espace entre table et boutons */
+    flex-wrap: wrap; /* pour que ça repasse en colonne sur petits écrans */
+}
+
+#panier {
+    flex: 2; /* prend plus de place */
+}
+
+#panier-totaux {
+    flex: 1; /* prend moins de place */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    .panier-title {
+        font-size: 32px;
+    }
+
+    #panier th, #panier td {
+        font-size: 14px;
+        padding: 0.5rem;
+    }
+
+    #actions-nonadherent {
+        flex-direction: column;
+    }
+
+    #actions-nonadherent button {
+        width: 100%;
+    }
+
+    #panier-container {
+        flex-direction: column;
+    }
+}

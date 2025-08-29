@@ -1,0 +1,102 @@
+.dons-hero {
+    background: #ededed;
+    padding: 2.5em 0 2em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dons-avatar {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(58,157,154,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1em;
+    overflow: hidden;
+}
+
+.dons-avatar img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.dons-title {
+    font-size: 1.7em;
+    color: #3A9D9A;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.dons-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(58,157,154,0.06);
+    margin: 2em auto;
+    padding: 2em;
+    width: 90%;
+    max-width: 400px;
+}
+
+.dons-section label {
+    font-weight: bold;
+    color: #18B76A;
+    display: block;
+    margin-top: 1.2em;
+    margin-bottom: 0.2em;
+}
+
+.dons-section input,
+.dons-section select {
+    width: 100%;
+    padding: 0.6em;
+    border: 1px solid #18B76A;
+    border-radius: 6px;
+    margin-bottom: 1em;
+    background: #f9f6f2;
+}
+
+.dons-section button {
+    background: #3A9D9A;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.7em 2em;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 1em;
+    transition: background 0.2s;
+}
+
+.dons-section button:hover {
+    background: #3BAFE2;
+    color: #fff;
+}
+
+.dons-links {
+    margin-top: 1.5em;
+    text-align: center;
+}
+
+.dons-links a {
+    color: #3A9D9A;
+    text-decoration: underline;
+    font-size: 0.98em;
+}
+
+.alert {
+    background: #fff30b89;
+    color: #2d2350;
+    padding: 1em;
+    border-radius: 8px;
+    margin-bottom: 1.5em;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #FFF30B;
+    box-shadow: 0 2px 8px rgba(246,193,119,0.08);
+}

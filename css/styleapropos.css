@@ -1,0 +1,283 @@
+* { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    section {
+      padding: 50px 20px;
+    }
+    h2 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    
+    
+    }
+
+.image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.background-pattern {
+  background-image: url('../../images/motif1_blanc.png'); /* adapte le chemin */
+  background-size: cover; /* ou contain, selon l'effet souhaité */
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  inset: 0; /* top: 0; right: 0; bottom: 0; left: 0 */
+  opacity: 0.40; /* ajuste comme tu veux */
+  z-index: 0;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.presentation .content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.presentation {
+  position: relative;
+  background-color: #A8EFE4; /* couleur fond vert clair */
+  padding: 60px 20px;
+  overflow: hidden;
+}
+
+    .histoire, .localisation{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      padding-left: 70px;
+      padding-right: 70px;
+      overflow: hidden;
+    }
+    .presentation { background-color: #b2f1e8; }
+
+    .histoire { background-color: #e9fefd; }
+
+    .localisation { background-color: #ffffff; }
+
+    .text, .image, .map {
+      flex: 1;
+      min-width: 280px;
+    }
+
+.presentation .text p,
+.histoire .text p,
+.localisation .text p {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+    .image, .map {
+      height: 200px;
+      background-color: #ccc;
+      border-radius: 12px;
+    }
+
+    .map iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+.contact {
+  background-color: #5ecbd4;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.contact h2 {
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+.image {
+  height: 280px; /* ajuste selon ce que tu veux */
+}
+
+@media (max-width: 768px) {
+  .image {
+    height: 200px; /* hauteur plus petite sur mobile */
+  }
+}
+
+
+.contact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.contact-info, .contact-person {
+  background-color: #55BDC6;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.contact-info p,
+.contact-person p {
+  margin: 10px 0;
+}
+
+.contact-person img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.socials a {
+  margin-right: 10px;
+  font-size: 1.5rem;
+  color: #555;
+  text-decoration: none;
+}
+
+.socials a:hover {
+  color: #000;
+}
+
+.quote-section {
+  position: relative;
+  background: url('benevoles.jpg') center/cover no-repeat;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.quote-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 140, 140, 0.7); /* superposition colorée turquoise */
+  z-index: 1;
+}
+
+.quote-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.quote-icon {
+  width: 80px;
+  height: auto;
+
+}
+
+.quote-text {
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.quote-author {
+  display: block;
+  margin-top: 0.5em;
+  font-size: 1rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.membres-bureau {
+  position: relative;
+  background-color: #08b9c2; /* couleur de fond si tu veux */
+  overflow: hidden;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: white;
+}
+
+.membres-bureau::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../images/motif1_blanc.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.08; /* ajuste l’opacité ici */
+  z-index: 0;
+}
+
+.membres-bureau > * {
+  position: relative;
+  z-index: 1;
+}
+
+.membres-bureau h2 {
+  font-size: 2em;
+  margin-bottom: 40px;
+}
+
+.membres-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+.membre {
+  max-width: 200px;
+}
+
+.membre img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: white;
+  padding: 5px;
+}
+
+.membre p {
+  margin-top: 15px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.membre span {
+  display: block;
+  font-weight: 300;
+  font-size: 0.9rem;
+}
+
+
+    @media (max-width: 768px) {
+      .presentation, .histoire, .localisation {
+        flex-direction: column;
+      }
+    }

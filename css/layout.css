@@ -1,0 +1,221 @@
+/* Palette de couleurs */
+:root {
+    --epise-vert: #3AD9A9;
+    --epise-bleu: #55BDC6;
+    --epise-bleuclair: #3BAFE2;
+    --epise-vertfonce: #18876A;
+    --epise-jaune: #88C321;
+    --epise-jaunevif: #FFF30B;
+    --epise-section1: #55BDC6;
+    --epise-section2: #4Ab2b2;
+    --epise-section3: #3AA4A4;
+    --epise-footer: #61D6E1;
+    --epise-btn: #3AD9A9;
+    --epise-btn-hover: #3BAFE2;
+    --epise-text: #222;
+    --epise-bg: #fff;
+}
+
+/* Footer style EPISE avec vague collée au bloc blanc */
+.epise-footer {
+    margin-top: 4em;
+    padding: 0 0 2em 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    
+}
+.epise-footer-inner {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0 auto;
+    padding: 0 2.5em 2.5em 2.5em;
+    max-width: 1200px;
+    width: 95vw;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: visible;
+    padding-top: 95px; /* Ajoute un espace en haut égal à la hauteur de la vague */
+}
+.epise-footer-wave {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    border-radius: 24px 24px 0 0;
+    overflow: hidden;
+    height: 80px;
+}
+.epise-footer-wave svg {
+    display: block;
+    width: 100%;
+    height: 80px;
+}
+.epise-footer-title {
+    font-family: 'Montserrat', 'Arial Black', Arial, sans-serif;
+    font-size: 3em;
+    font-weight: 900;
+    color: #222;
+    letter-spacing: -2px;
+    line-height: 1;
+    text-transform: lowercase;
+    margin-top: 60px; /* pour laisser la place à la vague */
+    margin-bottom: 1.2em;
+    z-index: 3;
+    position: relative;
+}
+.epise-footer-contact {
+    font-size: 1.1em;
+    color: #222;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 500;
+    margin-bottom: 0.5em;
+    margin-left: 0.2em;
+    max-width: 420px;
+    text-align: center;
+    z-index: 3;
+    position: relative;
+}
+.footer-link {
+    color: #222;
+    text-decoration: underline;
+    font-weight: bold;
+    transition: color 0.2s;
+    display: inline-block;
+    margin: 0.5em 1em 0.5em 0;
+}
+.footer-link:hover {
+    color: #3BAFE2;
+}
+
+/* Footer - Bloc infos du haut */
+.footer-infos {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1em;
+  margin-top: 20px;
+  margin-bottom: 0.5em;
+  text-align: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.footer-info-col {
+  flex: 1 1 260px;
+  min-width: 220px;
+  max-width: 350px;
+  box-sizing: border-box;
+  margin-bottom: 0.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.footer-info-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 0.05em;
+  color: #222;
+}
+.footer-info-text {
+  font-size: 0.97em;
+  color: #222;
+  margin-bottom: 0.1em;
+}
+.footer-socials {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 0.1em;
+}
+.footer-socials a {
+  color: #3BAFE2;
+  font-size: 1.5rem;
+  transition: color 0.3s;
+  display: inline-flex;
+  align-items: center;
+}
+.footer-socials a:hover {
+  color: #18876A;
+}
+.footer-phone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1em;
+  color: #18876A;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 0.98em;
+  gap: 0.5em;
+}
+.footer-phone i {
+  font-size: 1.3em;
+}
+
+/* Footer - Liens du bas */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 0.5em;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.footer-col {
+  min-width: 180px;
+  max-width: 300px;
+  box-sizing: border-box;
+  word-break: break-word;
+}
+.footer-col h4 {
+  font-size: 1.08em;
+  margin-bottom: 0.3em;
+  color: #3BAFE2;
+  font-weight: bold;
+  text-align: left;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+.footer-col ul li {
+  margin-bottom: 0.2em;
+}
+.footer-col ul li a {
+  color: #222;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 0.97em;
+}
+.footer-col ul li a:hover {
+  color: #18876A;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .epise-footer-inner {
+        padding: 0 0.5em 1.5em 0.5em;
+    }
+    .footer-infos, .footer-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5em;
+    }
+    .footer-info-col, .footer-col {
+        max-width: 100%;
+        text-align: center;
+    }
+    .footer-col h4, .footer-col ul {
+        text-align: center;
+    }
+}
