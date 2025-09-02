@@ -8,46 +8,80 @@
 </div>
 
 <div class="account-main">
-    <div class="account-section account-info-block">
+    <div class="account-info-block">
         <div class="account-info">
             <label>Numéro étudiant</label>
-            <div class="info-value"><?= htmlspecialchars($user['numero_etudiant'] ?? '') ?></div>
+            <div class="info-value"><?= htmlspecialchars($user['numero_etudiant'] ?? '-') ?></div>
 
             <label>Email</label>
-            <div class="info-value"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+            <div class="info-value"><?= htmlspecialchars($user['email'] ?? '-') ?></div>
 
-            <label>Nom Prénom</label>
-            <div class="info-value"><?= htmlspecialchars(($user['prenom'] ?? '') . ' ' . ($user['nom'] ?? '')) ?></div>
+            <label>Prénom</label>
+            <div class="info-value"><?= htmlspecialchars($user['prenom'] ?? '-') ?></div>
+
+            <label>Adhérent</label>
+            <div class="info-value"><?= !empty($user['adherent']) ? 'Oui' : 'Non' ?></div>
         </div>
-        <div style="margin-top:2em; text-align:center;">
-            <a href="/users/edit" class="btn-compte">Modifier mon profil</a>
-            <a href="/users/logout" class="btn-compte" style="margin-left:1em;">Déconnexion</a>
+        <div class="account-btns-row">
+            <a href="/users/edit" class="btn-compte btn-small">Modifier mon profil</a>
+            <a href="/users/logout" class="btn-compte btn-small">Déconnexion</a>
         </div>
     </div>
-
-    <div class="account-section account-orders-block">
-        <h2>Historique de mes commandes</h2>
-        <?php if (!empty($reservations)): ?>
-            <table class="account-orders">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Produits</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($reservations as $res): ?>
+    <div class="account-historiques">
+        <div class="account-section account-orders-block" style="width:100%; max-width:1100px; margin:0 auto;">
+            <h2>Historique de mes commandes</h2>
+            <?php if (!empty($reservations)): ?>
+                <table class="account-orders" style="width:100%;">
+                    <thead>
                         <tr>
-                            <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($res['date']))) ?></td>
-                            <td><?= htmlspecialchars($res['produits']) ?></td>
-                            <td><?= htmlspecialchars($res['statut']) ?></td>
+                            <th>Date</th>
+                            <th>Produits</th>
+                            <th>Statut</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>Aucune commande enregistrée.</p>
-        <?php endif; ?>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($reservations as $res): ?>
+                            <tr>
+                                <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($res['date']))) ?></td>
+                                <td>
+                                <?= !empty($res['produits']) ? htmlspecialchars($res['produits']) : '<em>Aucun produit</em>' ?>
+                                </td>
+                                <td><?= htmlspecialchars($res['statut']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>Aucune commande enregistrée.</p>
+            <?php endif; ?>
+        </div>
+
+        <div class="account-section account-dons-block" style="width:100%; max-width:1100px; margin:2em auto 0 auto;">
+            <h2>Mes dons</h2>
+            <?php if (!empty($dons)): ?>
+                <table class="account-dons" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Catégorie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($dons as $don): ?>
+                            <tr>
+                                <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($don['date_don']))) ?></td>
+                                <td><?= htmlspecialchars($don['produit']) ?></td>
+                                <td><?= htmlspecialchars($don['quantite']) ?></td>
+                                <td><?= htmlspecialchars($don['categorie_id']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>Aucun don enregistré.</p>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
