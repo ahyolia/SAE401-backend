@@ -5,8 +5,8 @@ class Users extends \app\Controller {
     private function requireUser() {
         if (
             empty($_SESSION['user']) ||
-            empty($_COOKIE['user_token']) ||
-            $_SESSION['user']['token'] !== $_COOKIE['user_token'] ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
             $_SESSION['user']['token_expire'] < time()
         ) {
             http_response_code(401);
@@ -17,17 +17,24 @@ class Users extends \app\Controller {
     }
 
     // POST /api/users/register
-    public function Register(): void {
+
+    public function register($api = false): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->loadModel('Users');
             $userModel = $this->Users;
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
             $role = $data['role'] ?? '';
-            // Vérification email déjà utilisé
             $email = $role === 'etudiant' ? ($data['email_etudiant'] ?? '') : ($data['email_particulier'] ?? '');
             if ($userModel->findByLogin($email)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => 'Cet email est déjà utilisé.']);
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Cet email est déjà utilisé.']);
+                    return;
+                }
+                $this->render('register', ['message' => 'Cet email est déjà utilisé.']);
                 return;
             }
             $veutAdherent = ($role === 'etudiant' && !empty($data['adherent']));
@@ -50,58 +57,87 @@ class Users extends \app\Controller {
             if ($userModel->register($userData)) {
                 $user = $userModel->findByLogin($userData['email']);
                 if ($user) {
-                    // Optionnel : auto-login, retour user
-                    header('Content-Type: application/json');
-                    echo json_encode([
-                        'success' => true,
-                        'user' => [
-                            'id' => $user['id'],
-                            'email' => $user['email'],
-                            'prenom' => $user['prenom'],
-                            'adherent' => $user['adherent'] ?? 0
-                        ],
-                        'message' => 'Inscription réussie.'
-                    ]);
+                    if ($api) {
+                        header('Content-Type: application/json');
+                        echo json_encode([
+                            'success' => true,
+                            'user' => [
+                                'id' => $user['id'],
+                                'email' => $user['email'],
+                                'prenom' => $user['prenom'],
+                                'adherent' => $user['adherent'] ?? 0
+                            ],
+                            'message' => 'Inscription réussie.'
+                        ]);
+                        return;
+                    }
+                    $this->render('register', ['message' => 'Inscription réussie.']);
                 } else {
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => false, 'message' => 'Erreur lors de la connexion automatique.']);
+                    if ($api) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => false, 'message' => 'Erreur lors de la connexion automatique.']);
+                        return;
+                    }
+                    $this->render('register', ['message' => 'Erreur lors de la connexion automatique.']);
                 }
             } else {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => 'Erreur lors de la création du compte.']);
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Erreur lors de la création du compte.']);
+                    return;
+                }
+                $this->render('register', ['message' => 'Erreur lors de la création du compte.']);
             }
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            if ($api) {
+                http_response_code(405);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Méthode non autorisée']);
+                return;
+            }
+            $this->render('register');
         }
     }
 
     // GET /api/users/activate
-    public function Activate(): void {
-        header('Content-Type: application/json');
-        echo json_encode(['message' => 'Merci, votre adresse mail est maintenant confirmée !']);
+
+    public function activate($api = false): void {
+        $msg = ['message' => 'Merci, votre adresse mail est maintenant confirmée !'];
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode($msg);
+            return;
+        }
+        $this->render('activate', $msg);
     }
 
     // POST /api/users/login
-    public function Login(): void {
+
+    public function login($api = false): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->loadModel('Users');
             $userModel = $this->Users;
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
             $login = $data['login'] ?? '';
             $password = $data['password'] ?? '';
             if (empty($login) || empty($password)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => 'Veuillez remplir tous les champs.']);
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Veuillez remplir tous les champs.']);
+                    return;
+                }
+                $this->render('login', ['message' => 'Veuillez remplir tous les champs.']);
                 return;
             }
             $user = $userModel->findByLogin($login);
             if ($user && password_verify($password, $user['password'])) {
                 $token = bin2hex(random_bytes(32));
                 $userModel->updateToken($user['email'], $token);
-                // Optionnel : durée d'expiration
                 $expire = time() + 3600;
+                setcookie('token', $token, $expire, '/');
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'prenom' => $user['prenom'],
@@ -110,58 +146,75 @@ class Users extends \app\Controller {
                     'token' => $token,
                     'token_expire' => $expire
                 ];
-                setcookie('token', $token, $expire);
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'success' => true,
-                    'user' => [
-                        'id' => $user['id'],
-                        'prenom' => $user['prenom'],
-                        'email' => $user['email'],
-                        'adherent' => $user['adherent'] ?? 0,
-                        'token' => $token
-                    ],
-                    'message' => 'Connexion réussie.'
-                ]);
+                header('Location: /');
+                exit;
             } else {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => "Nom d'utilisateur, email ou mot de passe incorrect."]);
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => "Nom d'utilisateur, email ou mot de passe incorrect."]);
+                    return;
+                }
+                $this->render('login', ['message' => "Nom d'utilisateur, email ou mot de passe incorrect."]);
             }
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            if ($api) {
+                http_response_code(405);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Méthode non autorisée']);
+                return;
+            }
+            // Affiche le formulaire de connexion en GET (hors API)
+            $this->render('login');
         }
     }
 
-    public function logout() {
+
+    public function logout($api = false): void {
         setcookie('token', '', time() - 3600, '/');
         session_destroy();
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => 'Déconnexion réussie.']);
+            return;
+        }
         header('Location: /');
         exit;
     }
 
    // GET /api/users/edit
-    public function Edit(): void {
+
+    public function edit($api = false): void {
         if (empty($_SESSION['user'])) {
-            http_response_code(401);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Utilisateur non connecté']);
+            if ($api) {
+                http_response_code(401);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Utilisateur non connecté']);
+                return;
+            }
+            $this->render('edit', ['message' => 'Utilisateur non connecté']);
             return;
         }
         $user = $_SESSION['user'];
-        header('Content-Type: application/json');
-        echo json_encode(['user' => $user]);
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode(['user' => $user]);
+            return;
+        }
+        $this->render('edit', compact('user'));
     }
 
     // POST /api/users/update
-    public function apiUpdate(): void {
-    $this->requireUser();
+
+    public function apiUpdate($api = false): void {
+        $this->requireUser();
         $this->loadModel('Users');
         $userModel = $this->Users;
         $userId = $_SESSION['user']['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
             $prenom = $data['prenom'] ?? $_SESSION['user']['prenom'];
             $email = $data['email'] ?? $_SESSION['user']['email'];
             $password = !empty($data['password']) ? $data['password'] : null;
@@ -174,81 +227,117 @@ class Users extends \app\Controller {
                 $msg = "Erreur lors de la mise à jour du profil.";
             }
             $user = $_SESSION['user'];
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'user' => $user,
-                'message' => $msg
-            ]);
+            if ($api) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => $success,
+                    'user' => $user,
+                    'message' => $msg
+                ]);
+                return;
+            }
+            echo $msg;
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            if ($api) {
+                http_response_code(405);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Méthode non autorisée']);
+                return;
+            }
+            echo 'Méthode non autorisée.';
         }
     }
 
     // GET /api/users/pay
-    public function apiPay(): void {
-    $this->requireUser();
-        // Exemple de structure à adapter selon le besoin réel
+
+    public function apiPay($api = false): void {
+        $this->requireUser();
         $user = $_SESSION['user'];
         $data = [
             'user' => $user,
             'message' => 'Veuillez procéder au paiement pour devenir adhérent.'
         ];
-        header('Content-Type: application/json');
-        echo json_encode($data);
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode($data);
+            return;
+        }
+        echo $data['message'];
     }
 
     // POST /api/users/pay
-    public function apiPayProcess(): void {
-    $this->requireUser();
+
+    public function apiPayProcess($api = false): void {
+        $this->requireUser();
         $this->loadModel('Users');
         $userId = $_SESSION['user']['id'];
         $this->Users->setAdherent($userId);
         $_SESSION['user']['adherent'] = 1;
         $msg = "Paiement réussi, vous êtes maintenant adhérent !";
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'message' => $msg,
-            'user' => $_SESSION['user']
-        ]);
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => $msg,
+                'user' => $_SESSION['user']
+            ]);
+            return;
+        }
+        echo $msg;
     }
     // GET /api/users/account
-    public function apiAccount(): void {
-    $this->requireUser();
-        $this->loadModel('Reservations');
-        $reservations = $this->Reservations->getByUser($_SESSION['user']['id']);
-        $user = $_SESSION['user'];
-        header('Content-Type: application/json');
-        echo json_encode([
-            'user' => $user,
-            'reservations' => $reservations
-        ]);
-    }
-    // Page de compte utilisateur (frontend)
-    public function account(): void {
+
+    public function apiAccount($api = false): void {
         $this->requireUser();
         $this->loadModel('Reservations');
         $reservations = $this->Reservations->getByUser($_SESSION['user']['id']);
         $user = $_SESSION['user'];
-        $this->render('account', compact('user', 'reservations'));
+        $data = [
+            'user' => $user,
+            'reservations' => $reservations
+        ];
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode($data);
+            return;
+        }
+        $this->render('account', $data);
+    }
+    // Page de compte utilisateur (frontend)
+
+    public function account($api = false): void {
+        $this->requireUser();
+        $this->loadModel('Reservations');
+        $this->loadModel('Dons');
+        $user = $_SESSION['user'];
+        $userId = $user['id'];
+        $reservations = $this->Reservations->getByUserId($userId);
+        $dons = $this->Dons->getByUserId($userId);
+        $this->render('account', compact('user', 'reservations', 'dons'));
     }
 
-    public function deleteAccount(): void {
-    $this->requireUser();
+
+    public function deleteAccount($api = false): void {
+        $this->requireUser();
         $this->loadModel('Users');
         $userId = $_SESSION['user']['id'];
         $success = $this->Users->deleteAccount($userId);
         if ($success) {
-            setcookie('user_token', '', time() - 3600, '/');
+            setcookie('token', '', time() - 3600, '/');
             session_destroy();
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Compte supprimé avec succès.']);
+            if ($api) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => 'Compte supprimé avec succès.']);
+                return;
+            }
+            echo 'Compte supprimé avec succès.';
         } else {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression du compte.']);
+            if ($api) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression du compte.']);
+                return;
+            }
+            echo 'Erreur lors de la suppression du compte.';
         }
     }
 }
