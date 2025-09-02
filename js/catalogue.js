@@ -4,8 +4,9 @@ let panier = JSON.parse(localStorage.getItem('panier')) || [];
 // Mise à jour du compteur d'articles dans le panier
 function updateCartCount() {
     const cartCount = document.getElementById('cart-count');
+    const panierLS = JSON.parse(localStorage.getItem('panier')) || [];
     if (cartCount) {
-        cartCount.textContent = panier.reduce((total, item) => total + item.quantity, 0);
+        cartCount.textContent = panierLS.reduce((total, item) => total + item.quantity, 0);
     }
 }
 
@@ -61,6 +62,7 @@ function addToCart(product, quantite = 1) {
 
 // Tout le code DOM dans DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
+    updateCartCount();
     // Gestion des boutons + et - pour la quantité
     document.querySelectorAll('.quantity-controls').forEach(container => {
         const minusBtn = container.querySelector('.quantity-btn:first-child');
@@ -175,4 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+
+    // Affichage du message dans la popup
+    document.getElementById('popup-message').textContent = data.message;
+    document.getElementById('popup-modal').style.display = 'block';
 });
