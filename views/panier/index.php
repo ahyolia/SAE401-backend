@@ -36,6 +36,11 @@
     </div>
 </main>
 
+<div id="popup-modal" style="display:none;position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:2em;border-radius:12px;box-shadow:0 2px 16px #3A9D9A;">
+  <span id="popup-message"></span>
+  <button onclick="document.getElementById('popup-modal').style.display='none'">Fermer</button>
+</div>
+
 <script src="/js/page_panier.js"></script>
 <script>
 window.isAdherent = "<?= (!empty($_SESSION['user']['adherent']) && $_SESSION['user']['adherent']) ? 'true' : 'false' ?>";
