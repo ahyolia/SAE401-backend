@@ -29,6 +29,19 @@ class Api extends \app\Controller{
     }
 
     public function index(...$params) : string {
+        // Protection API : accès uniquement si connecté
+        if (
+            empty($_SESSION['user']) ||
+            empty($_SESSION['user']['token']) ||
+            empty($_SESSION['user']['token_expire']) ||
+            $_SESSION['user']['token_expire'] < time() ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token']
+        ) {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            return json_encode(['error' => 'Accès API interdit : veuillez vous connecter.']);
+        }
         if (!isset($params[0]) || empty($params[0])) {
             // Retourne la liste des routes disponibles
             header('Content-Type: application/json');
