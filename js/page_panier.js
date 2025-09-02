@@ -138,26 +138,15 @@ document.getElementById('btn-valider').addEventListener('click', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('Votre panier a été validé avec succès !');
+                // Pop-up de confirmation
+                alert(data.message); // Remplace par ta modale si besoin
                 panier = [];
                 localStorage.setItem('panier', JSON.stringify(panier));
                 afficherPanier();
                 afficherJaugeAliments();
-                updateCartCount(); // Ajoute ici aussi
-
-                // Après validation réussie du panier
-                fetch('/panier/stocks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify([]) // ou le panier validé si besoin
-                })
-                .then(res => res.json())
-                .then(stocks => {
-                    if (window.majStocksCatalogue) {
-                        window.majStocksCatalogue(stocks);
-                    }
-                });
+                updateCartCount();
             } else {
+                // Pop-up d'erreur
                 alert(data.message || 'Erreur lors de la validation.');
             }
         });
