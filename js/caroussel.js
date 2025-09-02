@@ -1,9 +1,12 @@
 // === MENU BURGER ===
-const burgerBtn = document.getElementById('burger-btn');
-const nav = document.getElementById('main-nav');
-
-burgerBtn.addEventListener('click', () => {
-  nav.classList.toggle('active');
+document.addEventListener('DOMContentLoaded', function() {
+  const burgerBtn = document.getElementById('burger-btn');
+  const nav = document.getElementById('main-nav');
+  if (burgerBtn && nav) {
+    burgerBtn.addEventListener('click', () => {
+      nav.classList.toggle('active');
+    });
+  }
 });
 
 // === CAROUSEL ACTUALITÉS ===
@@ -79,8 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!track || items.length <= 1) return;
 
   let current = 0;
-  const visibleCount = Math.floor(track.offsetWidth / items[0].offsetWidth) || 1;
-  const total = items.length;
   const scrollStep = items[0].offsetWidth + 30; // 30px = gap
 
   function scrollToCurrent() {
@@ -90,8 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  setInterval(() => {
-    current = (current + 1) % total;
+  setInterval(function() {
+    current = (current + 1) % items.length;
     scrollToCurrent();
   }, 2500); // Change toutes les 2.5 secondes
 });
