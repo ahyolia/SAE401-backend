@@ -10,11 +10,16 @@ class Carrousel extends \app\Controller {
      */
     
      // GET /api/carrousel
-    public function Index(): void {
+
+    public function index($api = false): mixed {
         $this->loadModel('Carrousel');
         $carrousel = $this->Carrousel->getAll();
-        header('Content-Type: application/json');
-        echo json_encode($carrousel);
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode($carrousel);
+            return null;
+        }
+        return $this->render('index', compact('carrousel'), $api);
     }
 
     /**
@@ -23,21 +28,39 @@ class Carrousel extends \app\Controller {
      */
     
     // POST /api/carrousel
-    public function Create(): void {
+
+    public function create($api = false): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->loadModel('Carrousel');
-            $data = json_decode(file_get_contents('php://input'), true);
-            $success = $this->Carrousel->create($data);
-            $msg = $success ? "Élément ajouté au carrousel." : "Erreur lors de l'ajout.";
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'message' => $msg
-            ]);
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
+            try {
+                $success = $this->Carrousel->create($data);
+                $msg = $success ? "Élément ajouté au carrousel." : "Erreur lors de l'ajout.";
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => $success,
+                        'message' => $msg
+                    ]);
+                    return;
+                }
+                echo $msg;
+            } catch (\Throwable $e) {
+                if ($api) {
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Erreur : ' . $e->getMessage()
+                    ]);
+                    return;
+                }
+                echo 'Erreur : ' . $e->getMessage();
+            }
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            $this->render('create');
         }
     }
 
@@ -47,21 +70,40 @@ class Carrousel extends \app\Controller {
      * @return void
      */
     // PUT /api/carrousel/{id}
-    public function Update(int $id): void {
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            $this->loadModel('Carrousel');
+
+    public function update(int $id, $api = false): void {
+        $this->loadModel('Carrousel');
+        $data = $_POST;
+        if (empty($data)) {
             $data = json_decode(file_get_contents('php://input'), true);
-            $success = $this->Carrousel->update($id, $data);
-            $msg = $success ? "Élément du carrousel mis à jour." : "Erreur lors de la mise à jour.";
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'message' => $msg
-            ]);
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $success = $this->Carrousel->update($id, $data);
+                $msg = $success ? "Élément du carrousel mis à jour." : "Erreur lors de la mise à jour.";
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => $success,
+                        'message' => $msg
+                    ]);
+                    return;
+                }
+                echo $msg;
+            } catch (\Throwable $e) {
+                if ($api) {
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Erreur : ' . $e->getMessage()
+                    ]);
+                    return;
+                }
+                echo 'Erreur : ' . $e->getMessage();
+            }
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            $carrousel = $this->Carrousel->getById($id);
+            $this->render('update', compact('carrousel'));
         }
     }
 
@@ -71,20 +113,36 @@ class Carrousel extends \app\Controller {
      * @return void
      */
     // DELETE /api/carrousel/{id}
-    public function Delete(int $id): void {
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            $this->loadModel('Carrousel');
-            $success = $this->Carrousel->delete($id);
-            $msg = $success ? "Élément supprimé du carrousel." : "Erreur lors de la suppression.";
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'message' => $msg
-            ]);
+
+    public function delete(int $id, $api = false): void {
+        $this->loadModel('Carrousel');
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || $_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $success = $this->Carrousel->delete($id);
+                $msg = $success ? "Élément supprimé du carrousel." : "Erreur lors de la suppression.";
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => $success,
+                        'message' => $msg
+                    ]);
+                    return;
+                }
+                echo $msg;
+            } catch (\Throwable $e) {
+                if ($api) {
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Erreur : ' . $e->getMessage()
+                    ]);
+                    return;
+                }
+                echo 'Erreur : ' . $e->getMessage();
+            }
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            $carrousel = $this->Carrousel->getById($id);
+            $this->render('delete', compact('carrousel'));
         }
     }
 }
