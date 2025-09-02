@@ -219,3 +219,24 @@
         text-align: center;
     }
 }
+
+/* Exemple dans style.css */
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .burger {
+    display: block;
+  }
+  nav {
+    display: none;
+  }
+  nav.active {
+    display: block;
+  }
+}
