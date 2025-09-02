@@ -1,3 +1,11 @@
+<?php
+$isUserValid = !empty($_SESSION['user'])
+  && !empty($_SESSION['user']['token'])
+  && !empty($_SESSION['user']['token_expire'])
+  && $_SESSION['user']['token_expire'] > time()
+  && !empty($_COOKIE['token'])
+  && $_SESSION['user']['token'] === $_COOKIE['token'];
+?>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,34 +33,39 @@ $isBackoffice = strpos($_SERVER['REQUEST_URI'], '/backoffice') === 0
       <a href="/" class="logo">
         <img src="/images/epise_logo.png" alt="Logo de l'ÉPISE" />
       </a>
-      <?php if (!empty($_SESSION['user']['prenom'])): ?>
+      <?php if ($isUserValid): ?>
         <span class="nav-user" style="color:#55BDC6;font-weight:600;font-size:1.25em;">
           Bonjour <?= htmlspecialchars($_SESSION['user']['prenom']) ?> !
         </span>
       <?php endif; ?>
     </div>
-    <button class="burger" id="burger-btn" aria-label="Menu">
+    <button id="burger-btn" class="burger" aria-label="Menu">
       <i class="fas fa-bars"></i>
     </button>
     <nav id="main-nav" class="layout-nav">
-      
       <ul>
         <li><a href="/">Accueil</a></li>
-        <li><a href="/catalogue">Magasin</a></li>
         <li><a href="/apropos">À propos</a></li>
+        <li><a href="/catalogue">Magasin</a></li>
         <li><a href="/backoffice">Administrateur</a></li>
-        <li>
-          <a href="/panier"><i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;margin-left:4px;">0</span>
-          </a>
-        </li>
-        <li>
-          <?php if (!empty($_SESSION['user'])): ?>
-            <button onclick="window.location.href='/users/account'">Mon compte</button>
+          <?php if ($isUserValid): ?>
+            <li>
+              <a href="/benevoles/ajouter">Devenir bénévole</a>
+            </li>
+            <li>
+              <a href="/panier"><i class="fas fa-shopping-cart"></i>
+                <span id="cart-count" style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;margin-left:4px;">0</span>
+              </a>
+            </li>
+            
+            <li>
+              <button onclick="window.location.href='/users/account'">Mon compte</button>
+            </li>
           <?php else: ?>
-            <button onclick="window.location.href='/users/login'">Connexion</button>
+            <li>
+              <button onclick="window.location.href='/users/login'">Se connecter</button>
+            </li>
           <?php endif; ?>
-        </li>
       </ul>
     </nav>
   </header>
