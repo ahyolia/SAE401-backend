@@ -2,60 +2,87 @@
 namespace controllers;
 
 class Panier extends \app\Controller {
-    public function index() {
+
+    public function index($api = false): mixed {
+        if ($api && (
+            empty($_SESSION['user']) ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
+            $_SESSION['user']['token_expire'] < time()
+        )) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Accès interdit, veuillez vous connecter.']);
+            return null;
+        }
         $this->render('index');
+        return null;
     }
 
-    public function valider() {
+    public function valider($api = false): void {
+        if ($api && (
+            empty($_SESSION['user']) ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
+            $_SESSION['user']['token_expire'] < time()
+        )) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Accès interdit, veuillez vous connecter.']);
+            return;
+        }
         if (
             empty($_SESSION['user']) ||
             empty($_COOKIE['token']) ||
             $_SESSION['user']['token'] !== $_COOKIE['token'] ||
             $_SESSION['user']['token_expire'] < time()
         ) {
+            header('Content-Type: application/json');
             echo json_encode([
                 'success' => false,
                 'message' => 'Votre session a expiré. Veuillez vous reconnecter pour commander.'
             ]);
-            exit;
+            return;
         }
         $this->loadModel('Users');
         $userId = $_SESSION['user']['id'];
         $user = $this->Users->findById($userId);
 
         if ($user['role'] !== 'etudiant') {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Seuls les étudiants peuvent réserver un panier.']);
-            exit;
+            return;
         }
 
         if (!$this->Users->isAdherent($userId)) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Vous devez payer votre adhésion pour valider le panier.']);
-            exit;
+            return;
         }
 
-        // Limite de 2 paniers/semaine
         $this->loadModel('Reservations');
         $nbPaniers = $this->Reservations->countThisWeek($userId);
         if ($nbPaniers >= 2) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Vous avez déjà validé 2 paniers cette semaine.']);
-            exit;
+            return;
         }
 
         $data = json_decode(file_get_contents('php://input'), true);
         $this->loadModel('Produits');
         foreach ($data as $item) {
-            // Vérifie que la quantité demandée ne dépasse pas le stock disponible
             $produit = $this->Produits->getById($item['id']);
             if (!$produit || $produit['stock'] < $item['quantity']) {
-                echo json_encode(['success' => false, 'message' => 'Stock insuffisant pour ' . htmlspecialchars($produit['name'] ?? 'ce produit') . '.']);
-                exit;
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Stock insuffisant pour ' . htmlspecialchars($produit['name'] ?? 'ce produit') . '.']);
+                    return;
+                }
+                echo 'Stock insuffisant pour ' . htmlspecialchars($produit['name'] ?? 'ce produit') . '.';
+                return;
             }
         }
-        // Décrémente le stock après vérification
         foreach ($data as $item) {
             $this->Produits->decrementStock($item['id'], $item['quantity']);
         }
-        // Calcule la quantité totale
         $quantiteTotale = 0;
         foreach ($data as $item) {
             $quantiteTotale += $item['quantity'];
@@ -65,29 +92,29 @@ class Panier extends \app\Controller {
         $userId = $_SESSION['user']['id'];
         $date = date('Y-m-d H:i:s');
 
-        // 1. Insérer la réservation
+        // Si tout est OK, on crée la réservation
         $reservationId = $this->Reservations->add($userId, $date);
 
         if (!$reservationId) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Erreur lors de la création de la réservation.']);
-            exit;
+            return;
         }
 
-        // 2. Insérer chaque produit réservé
         foreach ($data as $item) {
             $this->Reservations->addProduit($reservationId, $item['id'], $item['quantity']);
         }
 
-        // Vider le panier en session
         unset($_SESSION['panier']);
 
-        // Réponse de succès
+        // Réponse JSON pour le JS
+        header('Content-Type: application/json');
         echo json_encode(['success' => true, 'message' => 'Réservation enregistrée et panier vidé.']);
-        exit;
     }
    
 
-    public function stocks() {
+
+    public function stocks($api = false): void {
         $data = json_decode(file_get_contents('php://input'), true);
         $this->loadModel('Produits');
         $stocks = [];
@@ -95,8 +122,8 @@ class Panier extends \app\Controller {
             $prod = $this->Produits->getById($item['id']);
             $stocks[$item['id']] = isset($prod['stock']) ? (int)$prod['stock'] : 99;
         }
+        header('Content-Type: application/json');
         echo json_encode($stocks);
-        exit;
     }
 }
 ?>
