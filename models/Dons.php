@@ -41,4 +41,13 @@ class Dons extends \app\Model {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    public function getByUserId($userId) {
+        $sql = "SELECT * FROM dons WHERE user_id = ? ORDER BY date_don DESC";
+        $stmt = $this->_connexion->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }
