@@ -84,5 +84,14 @@ class Reservations extends \app\Model {
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
+
+    public function getByUserId($userId) {
+        $sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY date DESC";
+        $stmt = $this->_connexion->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }
 ?>
