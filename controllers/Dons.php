@@ -6,8 +6,8 @@ class Dons extends \app\Controller {
     private function requireUser() {
         if (
             empty($_SESSION['user']) ||
-            empty($_COOKIE['user_token']) ||
-            $_SESSION['user']['token'] !== $_COOKIE['user_token'] ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
             $_SESSION['user']['token_expire'] < time()
         ) {
             http_response_code(401);
@@ -18,12 +18,30 @@ class Dons extends \app\Controller {
     }
 
     // POST /api/dons
-    public function Ajouter(): void {
-        
+
+    public function ajouter($api = false): void {
+        if (
+            empty($_SESSION['user']) ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
+            $_SESSION['user']['token_expire'] < time()
+        ) {
+            if ($api) {
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Accès interdit, veuillez vous connecter.']);
+                return;
+            }
+            $_SESSION['msg'] = "Vous devez être connecté pour faire un don.";
+            header('Location: /users/login');
+            exit;
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->requireUser();
             $this->loadModel('Dons');
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
             $don = [
                 'user_id' => $_SESSION['user']['id'],
                 'produit' => $data['produit'] ?? '',
@@ -33,15 +51,19 @@ class Dons extends \app\Controller {
             ];
             $success = $this->Dons->add($don);
             $msg = $success ? "Merci beaucoup pour votre don !" : "Erreur lors de l'enregistrement du don.";
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'message' => $msg
-            ]);
+            if ($api) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => $success,
+                    'message' => $msg
+                ]);
+                return;
+            }
+            echo $msg;
         } else {
-            http_response_code(405);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Méthode non autorisée']);
+            $this->loadModel('Categories');
+            $categories = $this->Categories->getAll();
+            $this->render('ajouter', compact('categories'));
         }
     }
     
