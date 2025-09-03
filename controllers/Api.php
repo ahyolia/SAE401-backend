@@ -30,13 +30,18 @@ class Api extends \app\Controller{
 
     public function index(...$params) : string {
         // Protection API : accès uniquement si connecté
+        // Sauf pour catalogue et articles
+        $publicRoutes = ['catalogue', 'articles'];
         if (
-            empty($_SESSION['user']) ||
-            empty($_SESSION['user']['token']) ||
-            empty($_SESSION['user']['token_expire']) ||
-            $_SESSION['user']['token_expire'] < time() ||
-            empty($_COOKIE['token']) ||
-            $_SESSION['user']['token'] !== $_COOKIE['token']
+            !in_array($params[0] ?? '', $publicRoutes) &&
+            (
+                empty($_SESSION['user']) ||
+                empty($_SESSION['user']['token']) ||
+                empty($_SESSION['user']['token_expire']) ||
+                $_SESSION['user']['token_expire'] < time() ||
+                empty($_COOKIE['token']) ||
+                $_SESSION['user']['token'] !== $_COOKIE['token']
+            )
         ) {
             http_response_code(401);
             header('Content-Type: application/json');
