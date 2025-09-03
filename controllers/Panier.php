@@ -4,20 +4,16 @@ namespace controllers;
 class Panier extends \app\Controller {
 
     public function index($api = false): mixed {
-        if ($api && (
-            empty($_SESSION['user']) ||
-            empty($_COOKIE['token']) ||
-            $_SESSION['user']['token'] !== $_COOKIE['token'] ||
-            $_SESSION['user']['token_expire'] < time()
-        )) {
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Accès interdit, veuillez vous connecter.']);
+        // Affichage du panier : public
+        if ($api) {
+            $this->render('index');
             return null;
         }
         $this->render('index');
         return null;
     }
 
+    // Pour valider le panier (réservation), garde la protection :
     public function valider($api = false): void {
         if ($api && (
             empty($_SESSION['user']) ||
