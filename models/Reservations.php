@@ -1,11 +1,14 @@
 <?php
 namespace models;
 class Reservations extends \app\Model {
-    public string $table = "reservations";
+    public function __construct() {
+        $this->table = "reservations"; 
+        parent::__construct(); 
+    }
 
     public function countThisWeek($userId) {
         $sql = "SELECT COUNT(*) as nb FROM `{$this->table}` WHERE user_id = ? AND YEARWEEK(date, 1) = YEARWEEK(NOW(), 1)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -15,17 +18,17 @@ class Reservations extends \app\Model {
 
     public function add($userId, $date) {
         $sql = "INSERT INTO reservations (user_id, date) VALUES (?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("is", $userId, $date);
         if (!$stmt->execute()) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
         }
-        return $this->_connexion->insert_id;
+        return $this->getConnection()->insert_id;
     }
 
     public function addProduit($reservationId, $produitId, $quantite) {
         $sql = "INSERT INTO reservation_produits (reservation_id, produit_id, quantite) VALUES (?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("iii", $reservationId, $produitId, $quantite);
         if (!$stmt->execute()) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
@@ -43,7 +46,7 @@ class Reservations extends \app\Model {
                 WHERE r.statut = 'en_attente'
                 GROUP BY r.id
                 ORDER BY r.date DESC";
-        $result = $this->_connexion->query($sql);
+        $result = $this->getConnection()->query($sql);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -58,13 +61,13 @@ class Reservations extends \app\Model {
                 WHERE r.statut = 'validee'
                 GROUP BY r.id
                 ORDER BY r.date DESC";
-        $result = $this->_connexion->query($sql);
+        $result = $this->getConnection()->query($sql);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function valider($id) {
         $sql = "UPDATE reservations SET statut = 'validee' WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
     }
@@ -78,7 +81,7 @@ class Reservations extends \app\Model {
             WHERE r.user_id = ?
             GROUP BY r.id
             ORDER BY r.date DESC";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -87,7 +90,7 @@ class Reservations extends \app\Model {
 
     public function getByUserId($userId) {
         $sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY date DESC";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();

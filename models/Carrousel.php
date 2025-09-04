@@ -5,7 +5,7 @@ class Carrousel extends \app\Model {
 
     public function __construct() {
         $this->table = "carrousel"; // Nom de la table associée
-        $this->getConnection();
+        parent::__construct(); 
     }
 
     /**
@@ -14,7 +14,7 @@ class Carrousel extends \app\Model {
      */
     public function getAll(): array {
         $sql = "SELECT * FROM `{$this->table}`";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return [];
@@ -31,7 +31,7 @@ class Carrousel extends \app\Model {
      */
     public function getById(int $id): array|bool {
         $sql = "SELECT * FROM `{$this->table}` WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return false;
@@ -49,7 +49,7 @@ class Carrousel extends \app\Model {
      */
     public function create(array $data): string {
         $sql = "INSERT INTO `{$this->table}` (`titre`, `image`, `description`, `categorie`) VALUES (?, ?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la création : $sql";
@@ -76,7 +76,7 @@ class Carrousel extends \app\Model {
      */
     public function update(int $id, array $data): string {
         $sql = "UPDATE `{$this->table}` SET `titre` = ?, `image` = ?, `description` = ? WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la mise à jour : $sql";
@@ -96,7 +96,7 @@ class Carrousel extends \app\Model {
      */
     public function delete(int $id): string {
         $sql = "DELETE FROM `{$this->table}` WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la suppression : $sql";
@@ -116,7 +116,7 @@ class Carrousel extends \app\Model {
      */
     public function getByCategorie($categorie): array {
         $sql = "SELECT * FROM `{$this->table}` WHERE categorie = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("s", $categorie);
         $stmt->execute();
         $result = $stmt->get_result();

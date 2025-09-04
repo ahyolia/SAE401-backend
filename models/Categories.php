@@ -6,13 +6,12 @@ class Categories extends \app\Model{
         // Nous définissons la table par défaut de ce modèle 
         $this->table = "categories"; 
         
-        // Nous ouvrons la connexion à la base de données 
-        $this->getConnection(); 
+        parent::__construct(); 
     }
 
     public function getAll(): array {
         $sql = "SELECT * FROM `{$this->table}`";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return [];
@@ -29,7 +28,7 @@ class Categories extends \app\Model{
      */
     public function getById(int $id): array|bool {
         $sql = "SELECT * FROM `{$this->table}` WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return false;
@@ -47,7 +46,7 @@ class Categories extends \app\Model{
      */
     public function create(array $data): string {
         $sql = "INSERT INTO `{$this->table}` (`name`) VALUES (?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la création : $sql";
@@ -68,7 +67,7 @@ class Categories extends \app\Model{
      */
     public function update(int $id, array $data): string {
         $sql = "UPDATE `{$this->table}` SET `name` = ? WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la mise à jour : $sql";
@@ -88,7 +87,7 @@ class Categories extends \app\Model{
      */
     public function delete(int $id): string {
         $sql = "DELETE FROM `{$this->table}` WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la suppression : $sql";

@@ -3,11 +3,8 @@
     class Articles extends \app\Model{ 
         
         public function __construct() {
-            // Nous définissons la table par défaut de ce modèle 
-            $this->table = "articles"; 
-            
-            // Nous ouvrons la connexion à la base de données 
-            $this->getConnection(); 
+            $this->table = "articles";
+            parent::__construct();
         }
 
     /**
@@ -17,7 +14,7 @@
 
     public function findBySlug(string $slug): array|bool {
         $sql = "SELECT * FROM ".$this->table." WHERE `slug`=?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         
         if(!$stmt) {
         \app\Debug::debugDie(array($stmt->errno,$stmt->error)); return false;
@@ -35,7 +32,7 @@
 
     public function getAll(): array {
         $sql = "SELECT * FROM `{$this->table}`";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return [];
@@ -54,7 +51,7 @@
      */  
     public function update(int $id, array $data): string {
         $sql = "UPDATE `{$this->table}` SET `titre` = ?, `contenu` = ?, `slug` = ?, `date_publication` = ?, `image` = ?, `is_main` = ? WHERE `id_article` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Erreur lors de la mise à jour.";
@@ -85,7 +82,7 @@
 
     public function create(array $data): string {
         $sql = "INSERT INTO `{$this->table}` (`titre`, `contenu`, `slug`, `date_publication`, `image`, `is_main`) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la création : $sql";
@@ -114,7 +111,7 @@
      */
     public function delete(int $id): string {
         $sql = "DELETE FROM `{$this->table}` WHERE `id_article` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la suppression : $sql";
@@ -129,7 +126,7 @@
 
     public function getById($id): ?array {
         $sql = "SELECT * FROM `{$this->table}` WHERE id_article = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();

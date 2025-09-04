@@ -1,5 +1,6 @@
 <?php 
     namespace app; 
+    require_once __DIR__ . '/Database.php'; // <-- Ajoute cette ligne
     use app\Database;
     
     abstract class Model { 
@@ -11,13 +12,14 @@
             $this->getConnection();
         }
 
-        public function getConnection(): void {
+        public function getConnection(): \mysqli {
             $this->_connexion = Database::getInstance()->getConnection();
+            return $this->_connexion;
         }
 
         public function getOne(): array|bool { 
             $sql = "SELECT * FROM `".$this->table."` WHERE `id`=?"; 
-            $stmt = $this->_connexion->prepare($sql);
+            $stmt = $this->getConnection()->prepare($sql);
             $stmt->bind_param("i", $this->id);
 
             if(!$stmt->execute()) {
@@ -30,7 +32,7 @@
 
         public function getAll(): array { 
             $sql = "SELECT * FROM `{$this->table}`"; 
-            $stmt = $this->_connexion->prepare($sql);
+            $stmt = $this->getConnection()->prepare($sql);
 
             if(!$stmt) {
                 \app\Debug::debugDie(array($stmt->errno,$stmt->error));

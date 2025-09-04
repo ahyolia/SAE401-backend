@@ -2,14 +2,19 @@
 namespace models;
 
 class Produits extends \app\Model {
-    public string $table = "produits"; // adapte si ta table s'appelle autrement
+    public function __construct() {
+        // Nous définissons la table par défaut de ce modèle 
+        $this->table = "produits"; 
+        
+        parent::__construct(); 
+    }
     
     // Récupérer tous les produits
     public function getAll(): array {
         $sql = "SELECT p.*, c.name AS category_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -18,7 +23,7 @@ class Produits extends \app\Model {
     // Récupérer un produit par son ID
     public function getById($id): ?array {
         $sql = "SELECT * FROM `{$this->table}` WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -27,7 +32,7 @@ class Produits extends \app\Model {
     
     public function getByName($name) {
         $sql = "SELECT * FROM `{$this->table}` WHERE name = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("s", $name);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -40,7 +45,7 @@ class Produits extends \app\Model {
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.category_id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $categoryId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -51,7 +56,7 @@ class Produits extends \app\Model {
     public function create($name, $description, $stock, $categoryId): string {
         // Vérifie si le produit existe déjà (par le nom)
         $sqlCheck = "SELECT id FROM `{$this->table}` WHERE name = ?";
-        $stmtCheck = $this->_connexion->prepare($sqlCheck);
+        $stmtCheck = $this->getConnection()->prepare($sqlCheck);
         $stmtCheck->bind_param("s", $name);
         $stmtCheck->execute();
         $stmtCheck->store_result();
@@ -61,7 +66,7 @@ class Produits extends \app\Model {
 
         // Ajout si non existant
         $sql = "INSERT INTO `{$this->table}` (name, description, stock, category_id) VALUES (?, ?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("ssdi", $name, $description, $stock, $categoryId);
         if ($stmt->execute()) {
             return "Produit ajouté avec succès.";
@@ -74,11 +79,11 @@ class Produits extends \app\Model {
     public function update($id, $name, $description, $stock, $category_id, $image = null) {
         if ($image !== null) {
             $sql = "UPDATE `produits` SET name = ?, description = ?, stock = ?, category_id = ?, image = ? WHERE id = ?";
-            $stmt = $this->_connexion->prepare($sql);
+            $stmt = $this->getConnection()->prepare($sql);
             $stmt->bind_param("ssissi", $name, $description, $stock, $category_id, $image, $id);
         } else {
             $sql = "UPDATE `produits` SET name = ?, description = ?, stock = ?, category_id = ? WHERE id = ?";
-            $stmt = $this->_connexion->prepare($sql);
+            $stmt = $this->getConnection()->prepare($sql);
             $stmt->bind_param("ssisi", $name, $description, $stock, $category_id, $id);
         }
         if (!$stmt->execute()) {
@@ -91,7 +96,7 @@ class Produits extends \app\Model {
     // Supprimer un produit
     public function delete($id): string {
         $sql = "DELETE FROM `{$this->table}` WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
             return "Suppression réussie.";
@@ -103,7 +108,7 @@ class Produits extends \app\Model {
     // Décrémenter le stock d'un produit
     public function decrementStock($id, $quantity) {
         $sql = "UPDATE {$this->table} SET stock = stock - ? WHERE id = ? AND stock >= ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("iii", $quantity, $id, $quantity);
         $stmt->execute();
     }

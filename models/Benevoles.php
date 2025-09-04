@@ -2,11 +2,14 @@
 namespace models;
 
 class Benevoles extends \app\Model {
-    public string $table = "benevoles";
+    public function __construct() {
+        $this->table = "benevoles";
+        parent::__construct(); // Initialise la connexion Singleton
+    }
 
     public function getNonValides() {
         $sql = "SELECT * FROM benevoles WHERE valide = 0";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -14,7 +17,7 @@ class Benevoles extends \app\Model {
 
     public function getValides() {
         $sql = "SELECT * FROM benevoles WHERE valide = 1";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -22,7 +25,7 @@ class Benevoles extends \app\Model {
 
     public function getAll(): array {
         $sql = "SELECT * FROM benevoles";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -30,7 +33,7 @@ class Benevoles extends \app\Model {
 
     public function getById($id) {
         $sql = "SELECT * FROM benevoles WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -39,28 +42,28 @@ class Benevoles extends \app\Model {
 
     public function add($data) {
         $sql = "INSERT INTO benevoles (nom, prenom, email, telephone) VALUES (?, ?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("ssss", $data['nom'], $data['prenom'], $data['email'], $data['telephone']);
         return $stmt->execute();
     }
 
     public function valider($id) {
         $sql = "UPDATE benevoles SET valide = 1, date_validation = NOW() WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
 
     public function delete($id) {
         $sql = "DELETE FROM benevoles WHERE id = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
 
     public function create(array $data): bool {
         $sql = "INSERT INTO benevoles (nom, prenom, email, telephone) VALUES (?, ?, ?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             return false;
         }
