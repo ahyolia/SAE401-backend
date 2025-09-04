@@ -83,19 +83,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ajout des écouteurs d'événements sur chaque bouton "Ajouter au panier"
     document.querySelectorAll('.add-to-cart').forEach((button) => {
         button.addEventListener('click', (event) => {
-            if (button.disabled) {
-                event.preventDefault();
+            // Vérifie la connexion (exemple : présence du token dans le cookie ou localStorage)
+            const isConnected = !!(document.cookie.match(/(^|;) *token=/) || localStorage.getItem('token'));
+            if (!isConnected) {
+                window.location.href = '/users/login';
                 return;
             }
-            const productElement = event.target.closest('.product-card');
-            let productName = '';
-            if (productElement) {
-                const h4 = productElement.querySelector('h4');
-                if (h4) {
-                    productName = h4.textContent;
-                }
-            }
             // Récupère la quantité depuis le span.quantity
+            const productElement = event.target.closest('.product-card');
             const quantitySpan = productElement.querySelector('.quantity-controls .quantity');
             let qty = quantitySpan ? parseInt(quantitySpan.textContent, 10) : 1;
             if (qty < 1) qty = 1;
@@ -103,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Construction de l'objet produit avec toutes les propriétés nécessaires
             const product = {
                 id: productElement ? productElement.dataset.id : '',
-                name: productName,
+                name: productElement ? productElement.querySelector('h4').textContent : '',
                 image: productElement ? productElement.querySelector('img').src : '',
                 category: productElement ? (productElement.dataset.category || '').toLowerCase() : '',
                 stock: productElement ? parseInt(productElement.dataset.stock, 10) : 99,
