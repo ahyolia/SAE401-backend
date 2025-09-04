@@ -3,10 +3,8 @@ namespace models;
 class administrateur extends \app\Model{
 
 public function __construct() {
-    // Nous définissons la table par défaut de ce modèle
     $this->table = "administrateur";
-    // Nous ouvrons la connexion à la base de données
-    $this->getConnection();
+    parent::__construct();
 }
 
 /**
@@ -17,7 +15,7 @@ public function __construct() {
 
 public function connexion(string $log, string $mdp): bool {
     $sql = "SELECT * FROM `{$this->table}` WHERE `login`=?";
-    $stmt = $this->_connexion->prepare($sql);
+    $stmt = $this->getConnection()->prepare($sql);
     if(!$stmt) {
         \app\Debug::debugDie(array($stmt->errno,$stmt->error));
         return false;
@@ -39,7 +37,7 @@ public function connexion(string $log, string $mdp): bool {
      */
     public function create(array $data): string {
         $sql = "INSERT INTO `{$this->table}` (`login`, `mdp`) VALUES (?, ?)";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la création : $sql";
@@ -63,7 +61,7 @@ public function connexion(string $log, string $mdp): bool {
      */
     public function update(int $id, array $data): string {
         $sql = "UPDATE `{$this->table}` SET `login` = ?, `mdp` = ? WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la mise à jour : $sql";
@@ -86,7 +84,7 @@ public function connexion(string $log, string $mdp): bool {
     
     public function delete(int $id): string {
         $sql = "DELETE FROM `{$this->table}` WHERE `id` = ?";
-        $stmt = $this->_connexion->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if (!$stmt) {
             \app\Debug::debugDie([$stmt->errno, $stmt->error]);
             return "Echec de la suppression : $sql";
