@@ -1,12 +1,11 @@
 <?php
 namespace models;
+use app\ModelInterface;
 
-class Produits extends \app\Model {
+class Produits extends \app\Model implements ModelInterface {
     public function __construct() {
-        // Nous définissons la table par défaut de ce modèle 
-        $this->table = "produits"; 
-        
-        parent::__construct(); 
+        $this->table = "produits";
+        parent::__construct();
     }
     
     // Récupérer tous les produits

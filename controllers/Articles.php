@@ -1,7 +1,12 @@
 <?php
     namespace controllers; 
+    use app\ModelFactory;
 
     class Articles extends \app\Controller{ 
+        protected $articlesModel;
+        public function __construct() {
+            $this->articlesModel = ModelFactory::create('Articles');
+        }
 
 
         /** Cette méthode affiche la liste des articles *

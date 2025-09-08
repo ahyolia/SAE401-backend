@@ -1,10 +1,11 @@
 <?php
 namespace models;
+use app\ModelInterface;
 
-class Benevoles extends \app\Model {
+class Benevoles extends \app\Model implements ModelInterface {
     public function __construct() {
         $this->table = "benevoles";
-        parent::__construct(); // Initialise la connexion Singleton
+        parent::__construct();
     }
 
     public function getNonValides() {

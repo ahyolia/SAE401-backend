@@ -1,5 +1,7 @@
 <?php
 namespace controllers;
+use app\ModelFactory;
+
 class Users extends \app\Controller {
     // Mutualisation de la vérification du token utilisateur
     private function requireUser() {

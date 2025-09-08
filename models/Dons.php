@@ -1,7 +1,8 @@
 <?php
 namespace models;
+use app\ModelInterface;
 
-class Dons extends \app\Model {
+class Dons extends \app\Model implements ModelInterface {
     public function __construct() {
         // Nous définissons la table par défaut de ce modèle 
         $this->table = "dons"; 

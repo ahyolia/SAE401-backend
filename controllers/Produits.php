@@ -1,49 +1,33 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Produits extends \app\Controller {
 
+    protected $produitsModel;
+
+    public function __construct() {
+        $this->produitsModel = ModelFactory::create('Produits');
+    }
+
     public function getAll() {
-        $sql = "SELECT * FROM produits";
-        return $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->produitsModel->getAll();
     }
 
     public function getById($id) {
-        $sql = "SELECT * FROM produits WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $this->produitsModel->getById($id);
     }
 
     public function create($data) {
-        $sql = "INSERT INTO produits (name, description, stock, category_id) VALUES (?, ?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            $data['name'],
-            $data['description'],
-            $data['stock'],
-            $data['category_id']
-        ]);
-        return "Produit ajouté avec succès.";
+        return $this->produitsModel->create($data);
     }
 
     public function update($id, $data) {
-        $sql = "UPDATE produits SET name = ?, description = ?, stock = ?, category_id = ? WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            $data['name'],
-            $data['description'],
-            $data['stock'],
-            $data['category_id'],
-            $id
-        ]);
-        return "Produit mis à jour.";
+        return $this->produitsModel->update($id, $data);
     }
 
     public function delete($id) {
-        $sql = "DELETE FROM produits WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$id]);
-        return "Produit supprimé.";
+        return $this->produitsModel->delete($id);
     }
 }

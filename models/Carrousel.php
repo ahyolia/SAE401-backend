@@ -1,7 +1,8 @@
 <?php
 namespace models;
+use app\ModelInterface;
 
-class Carrousel extends \app\Model {
+class Carrousel extends \app\Model implements ModelInterface {
 
     public function __construct() {
         $this->table = "carrousel"; // Nom de la table associée

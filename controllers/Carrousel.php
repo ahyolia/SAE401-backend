@@ -1,8 +1,14 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Carrousel extends \app\Controller {
-   
+    protected $carrouselModel;
+
+    public function __construct() {
+        $this->carrouselModel = ModelFactory::create('Carrousel');
+    }
 
     /**
      * Affiche la liste des éléments du carrousel
@@ -12,8 +18,7 @@ class Carrousel extends \app\Controller {
      // GET /api/carrousel
 
     public function index($api = false): mixed {
-        $this->loadModel('Carrousel');
-        $carrousel = $this->Carrousel->getAll();
+        $carrousel = $this->carrouselModel->getAll();
         if ($api) {
             header('Content-Type: application/json');
             echo json_encode($carrousel);
@@ -31,13 +36,12 @@ class Carrousel extends \app\Controller {
 
     public function create($api = false): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->loadModel('Carrousel');
             $data = $_POST;
             if (empty($data)) {
                 $data = json_decode(file_get_contents('php://input'), true);
             }
             try {
-                $success = $this->Carrousel->create($data);
+                $success = $this->carrouselModel->create($data);
                 $msg = $success ? "Élément ajouté au carrousel." : "Erreur lors de l'ajout.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -72,14 +76,13 @@ class Carrousel extends \app\Controller {
     // PUT /api/carrousel/{id}
 
     public function update(int $id, $api = false): void {
-        $this->loadModel('Carrousel');
         $data = $_POST;
         if (empty($data)) {
             $data = json_decode(file_get_contents('php://input'), true);
         }
         if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $success = $this->Carrousel->update($id, $data);
+                $success = $this->carrouselModel->update($id, $data);
                 $msg = $success ? "Élément du carrousel mis à jour." : "Erreur lors de la mise à jour.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -102,7 +105,7 @@ class Carrousel extends \app\Controller {
                 echo 'Erreur : ' . $e->getMessage();
             }
         } else {
-            $carrousel = $this->Carrousel->getById($id);
+            $carrousel = $this->carrouselModel->getById($id);
             $this->render('update', compact('carrousel'));
         }
     }
@@ -115,10 +118,9 @@ class Carrousel extends \app\Controller {
     // DELETE /api/carrousel/{id}
 
     public function delete(int $id, $api = false): void {
-        $this->loadModel('Carrousel');
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || $_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $success = $this->Carrousel->delete($id);
+                $success = $this->carrouselModel->delete($id);
                 $msg = $success ? "Élément supprimé du carrousel." : "Erreur lors de la suppression.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -141,7 +143,7 @@ class Carrousel extends \app\Controller {
                 echo 'Erreur : ' . $e->getMessage();
             }
         } else {
-            $carrousel = $this->Carrousel->getById($id);
+            $carrousel = $this->carrouselModel->getById($id);
             $this->render('delete', compact('carrousel'));
         }
     }

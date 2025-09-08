@@ -1,6 +1,8 @@
 <?php
 namespace models;
-class administrateur extends \app\Model{
+use app\ModelInterface;
+
+class administrateur extends \app\Model implements ModelInterface {
 
 public function __construct() {
     $this->table = "administrateur";

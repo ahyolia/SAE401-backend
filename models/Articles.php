@@ -1,7 +1,8 @@
 <?php
-    namespace models; 
-    class Articles extends \app\Model{ 
-        
+    namespace models;
+    use app\ModelInterface;
+
+    class Articles extends \app\Model implements ModelInterface {
         public function __construct() {
             $this->table = "articles";
             parent::__construct();

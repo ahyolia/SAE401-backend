@@ -1,14 +1,20 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Benevoles extends \app\Controller {
+    protected $benevolesModel;
+
+    public function __construct() {
+        $this->benevolesModel = ModelFactory::create('Benevoles');
+    }
 
     // GET /api/benevoles
     public function index($api = false): mixed {
-        $this->loadModel('Benevoles');
         $data = [
-            'benevoles_non_valides' => $this->Benevoles->getNonValides(),
-            'benevoles_valides' => $this->Benevoles->getValides()
+            'benevoles_non_valides' => $this->benevolesModel->getNonValides(),
+            'benevoles_valides' => $this->benevolesModel->getValides()
         ];
         if ($api) {
             header('Content-Type: application/json');
@@ -21,7 +27,6 @@ class Benevoles extends \app\Controller {
 
     // PUT /api/benevoles/{id}/action
     public function updateBenevole($id, $api = false): void {
-        $this->loadModel('Benevoles');
         $data = $_POST;
         if (empty($data)) {
             $data = json_decode(file_get_contents('php://input'), true);
@@ -30,10 +35,10 @@ class Benevoles extends \app\Controller {
         $msg = '';
         $success = false;
         if ($action === 'valider') {
-            $success = $this->Benevoles->valider($id);
+            $success = $this->benevolesModel->valider($id);
             $msg = "Bénévole accepté et ajouté à la liste.";
         } elseif ($action === 'refuser' || $action === 'supprimer') {
-            $success = $this->Benevoles->delete($id);
+            $success = $this->benevolesModel->delete($id);
             $msg = ($action === 'refuser') ? "Bénévole refusé et supprimé." : "Bénévole validé supprimé.";
         } else {
             $msg = 'Action non reconnue.';
@@ -43,15 +48,15 @@ class Benevoles extends \app\Controller {
             echo json_encode([
                 'success' => $success,
                 'message' => $msg,
-                'benevoles_non_valides' => $this->Benevoles->getNonValides(),
-                'benevoles_valides' => $this->Benevoles->getValides()
+                'benevoles_non_valides' => $this->benevolesModel->getNonValides(),
+                'benevoles_valides' => $this->benevolesModel->getValides()
             ]);
             return;
         }
         $data = [
             'msg' => $msg,
-            'benevoles_non_valides' => $this->Benevoles->getNonValides(),
-            'benevoles_valides' => $this->Benevoles->getValides()
+            'benevoles_non_valides' => $this->benevolesModel->getNonValides(),
+            'benevoles_valides' => $this->benevolesModel->getValides()
         ];
         $this->render('updateBenevole', $data);
     }
@@ -59,8 +64,7 @@ class Benevoles extends \app\Controller {
 
     // GET /api/benevoles/liste
     public function liste($api = false): mixed {
-        $this->loadModel('Benevoles');
-        $benevoles = $this->Benevoles->getAll();
+        $benevoles = $this->benevolesModel->getAll();
         if ($api) {
             header('Content-Type: application/json');
             echo json_encode($benevoles);
@@ -95,13 +99,12 @@ class Benevoles extends \app\Controller {
             exit;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->loadModel('Benevoles');
             $data = $_POST;
             if (empty($data)) {
                 $data = json_decode(file_get_contents('php://input'), true);
             }
             try {
-                $success = $this->Benevoles->create($data);
+                $success = $this->benevolesModel->create($data);
                 $msg = $success ? "Votre demande de bénévolat a bien été envoyée. Merci !" : "Erreur lors de l'envoi de la demande.";
                 if ($api) {
                     header('Content-Type: application/json');

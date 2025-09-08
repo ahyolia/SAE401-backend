@@ -1,13 +1,19 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Categories extends \app\Controller {
+    protected $categoriesModel;
+
+    public function __construct() {
+        $this->categoriesModel = ModelFactory::create('Categories');
+    }
 
     // GET /api/categories
 
     public function index($api = false): mixed {
-        $this->loadModel('Categories');
-        $categories = $this->Categories->getAll();
+        $categories = $this->categoriesModel->getAll();
         if ($api) {
             header('Content-Type: application/json');
             echo json_encode($categories);
@@ -20,13 +26,12 @@ class Categories extends \app\Controller {
 
     public function create($api = false): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->loadModel('Categories');
             $data = $_POST;
             if (empty($data)) {
                 $data = json_decode(file_get_contents('php://input'), true);
             }
             try {
-                $success = $this->Categories->create($data);
+                $success = $this->categoriesModel->create($data);
                 $msg = $success ? "Catégorie ajoutée." : "Erreur lors de l'ajout.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -56,14 +61,13 @@ class Categories extends \app\Controller {
     // PUT /api/categories/{id}
 
     public function update(int $id, $api = false): void {
-        $this->loadModel('Categories');
         $data = $_POST;
         if (empty($data)) {
             $data = json_decode(file_get_contents('php://input'), true);
         }
         if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $success = $this->Categories->update($id, $data);
+                $success = $this->categoriesModel->update($id, $data);
                 $msg = $success ? "Catégorie mise à jour." : "Erreur lors de la mise à jour.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -86,7 +90,7 @@ class Categories extends \app\Controller {
                 echo 'Erreur : ' . $e->getMessage();
             }
         } else {
-            $categorie = $this->Categories->getById($id);
+            $categorie = $this->categoriesModel->getById($id);
             $this->render('update', compact('categorie'));
         }
     }
@@ -94,10 +98,9 @@ class Categories extends \app\Controller {
     // DELETE /api/categories/{id}
 
     public function delete(int $id, $api = false): void {
-        $this->loadModel('Categories');
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || $_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $success = $this->Categories->delete($id);
+                $success = $this->categoriesModel->delete($id);
                 $msg = $success ? "Catégorie supprimée." : "Erreur lors de la suppression.";
                 if ($api) {
                     header('Content-Type: application/json');
@@ -120,7 +123,7 @@ class Categories extends \app\Controller {
                 echo 'Erreur : ' . $e->getMessage();
             }
         } else {
-            $categorie = $this->Categories->getById($id);
+            $categorie = $this->categoriesModel->getById($id);
             $this->render('delete', compact('categorie'));
         }
     }

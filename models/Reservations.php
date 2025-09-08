@@ -1,6 +1,8 @@
 <?php
 namespace models;
-class Reservations extends \app\Model {
+use app\ModelInterface;
+
+class Reservations extends \app\Model implements ModelInterface {
     public function __construct() {
         $this->table = "reservations"; 
         parent::__construct(); 

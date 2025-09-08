@@ -1,7 +1,15 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Catalogue extends \app\Controller {
+    protected $catalogueModel;
+
+    public function __construct() {
+        $this->catalogueModel = ModelFactory::create('Catalogue');
+    }
+
     // GET /api/catalogue
 
     public function index($api = false): mixed {

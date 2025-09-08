@@ -1,7 +1,14 @@
 <?php
 namespace controllers;
 
+use app\ModelFactory;
+
 class Panier extends \app\Controller {
+    protected $panierModel;
+
+    public function __construct() {
+        $this->panierModel = ModelFactory::create('Panier');
+    }
 
     public function index($api = false): mixed {
         // Affichage du panier : public
