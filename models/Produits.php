@@ -1,5 +1,7 @@
 <?php
 namespace models;
+
+require_once __DIR__ . '/../app/ModelInterface.php';
 use app\ModelInterface;
 
 class Produits extends \app\Model implements ModelInterface {

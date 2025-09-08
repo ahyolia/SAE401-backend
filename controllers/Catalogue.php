@@ -1,13 +1,15 @@
 <?php
 namespace controllers;
 
+require_once __DIR__ . '/../app/ModelFactory.php';
 use app\ModelFactory;
+
 
 class Catalogue extends \app\Controller {
     protected $catalogueModel;
 
     public function __construct() {
-        $this->catalogueModel = ModelFactory::create('Catalogue');
+        //$this->catalogueModel = ModelFactory::create('Catalogue');
     }
 
     // GET /api/catalogue
