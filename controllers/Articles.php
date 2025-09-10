@@ -1,6 +1,8 @@
 <?php
-    namespace controllers; 
-    use app\ModelFactory;
+namespace controllers; 
+
+require_once __DIR__ . '/../app/ModelFactory.php';
+use app\ModelFactory;
 
     class Articles extends \app\Controller{ 
         protected $articlesModel;
@@ -14,6 +16,11 @@
         public function index($api=false): mixed{
             $this->loadModel('Articles');
             $articles = $this->Articles->getAll();
+            foreach ($articles as &$article) {
+                if (!empty($article['image']) && strpos($article['image'], 'http') !== 0) {
+                    $article['image'] = 'http://localhost/SAE401/' . ltrim($article['image'], '/');
+                }
+            }
             if ($api) {
                 header('Content-Type: application/json');
                 echo json_encode($articles);
@@ -46,7 +53,13 @@
                     $data = json_decode(file_get_contents('php://input'), true);
                 }
                 try {
-                    $message = $this->Articles->create($data);
+                    $this->Articles->create([
+                        'titre' => $_POST['titre'],
+                        'contenu' => $_POST['contenu'],
+                        'image' => $data['image'],
+                        // ...
+                    ]);
+                    $message = "Article créé avec succès.";
                     if ($api) {
                         header('Content-Type: application/json');
                         echo json_encode(['success' => true, 'message' => $message]);

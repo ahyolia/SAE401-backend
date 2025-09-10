@@ -1,7 +1,6 @@
 <?php
 namespace models;
-
-require_once __DIR__ . '/../app/ModelInterface.php'; // Ajoute cette ligne
+require_once __DIR__ . '/../app/ModelInterface.php';
 use app\ModelInterface;
 
 class Articles extends \app\Model implements ModelInterface {

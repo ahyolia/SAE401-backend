@@ -1,14 +1,12 @@
 <?php
 namespace models;
-
 require_once __DIR__ . '/../app/ModelInterface.php';
 use app\ModelInterface;
 
 class Carrousel extends \app\Model implements ModelInterface {
-
     public function __construct() {
-        $this->table = "carrousel"; // Nom de la table associée
-        parent::__construct(); 
+        $this->table = "carrousel";
+        parent::__construct();
     }
 
     /**

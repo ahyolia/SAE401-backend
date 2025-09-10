@@ -31,7 +31,7 @@ class Api extends \app\Controller{
     public function index(...$params) : string {
         // Protection API : accès uniquement si connecté
         // Sauf pour catalogue et articles
-        $publicRoutes = ['catalogue', 'articles'];
+        $publicRoutes = ['catalogue', 'articles', 'carrousel'];
         if (
             !in_array($params[0] ?? '', $publicRoutes) &&
             (

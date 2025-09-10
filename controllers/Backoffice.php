@@ -125,6 +125,8 @@ class Backoffice extends \app\Controller {
                     }
                     $imagePath = $uploadDir . basename($_FILES['image']['name']);
                     if (move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+                        // $imagePath = 'images/monimage.jpg'
+                        // Enregistre $imagePath dans la BDD
                         $data['image'] = $imagePath;
                     }
                 }

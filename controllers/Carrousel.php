@@ -1,7 +1,9 @@
 <?php
 namespace controllers;
 
+require_once __DIR__ . '/../app/ModelFactory.php';
 use app\ModelFactory;
+
 
 class Carrousel extends \app\Controller {
     protected $carrouselModel;
@@ -20,6 +22,12 @@ class Carrousel extends \app\Controller {
     public function index($api = false): mixed {
         $carrousel = $this->carrouselModel->getAll();
         if ($api) {
+            // Ajoute le chemin complet pour chaque image
+            foreach ($carrousel as &$item) {
+                if (!empty($item['image']) && strpos($item['image'], 'http') !== 0) {
+                    $item['image'] = 'http://localhost/SAE401/' . ltrim($item['image'], '/');
+                }
+            }
             header('Content-Type: application/json');
             echo json_encode($carrousel);
             return null;
@@ -41,6 +49,17 @@ class Carrousel extends \app\Controller {
                 $data = json_decode(file_get_contents('php://input'), true);
             }
             try {
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'images/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
+                    $imagePath = $uploadDir . $imageName;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+                        $data['image'] = $imagePath; // Stocke 'images/xxxx.jpg' en BDD
+                    }
+                }
                 $success = $this->carrouselModel->create($data);
                 $msg = $success ? "Élément ajouté au carrousel." : "Erreur lors de l'ajout.";
                 if ($api) {
@@ -82,6 +101,17 @@ class Carrousel extends \app\Controller {
         }
         if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'images/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
+                    $imagePath = $uploadDir . $imageName;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+                        $data['image'] = $imagePath; // Stocke 'images/xxxx.jpg' en BDD
+                    }
+                }
                 $success = $this->carrouselModel->update($id, $data);
                 $msg = $success ? "Élément du carrousel mis à jour." : "Erreur lors de la mise à jour.";
                 if ($api) {
