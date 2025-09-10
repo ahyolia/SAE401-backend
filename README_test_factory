@@ -1,0 +1,23 @@
+# Test de la Factory des Modèles
+
+Ce script teste la fabrique (`ModelFactory`) de votre projet MVC.
+
+## Utilisation
+
+1. Placez `test_factory.php` à la racine de votre projet.
+2. Exécutez-le dans un terminal :
+   ```
+   php test_factory.php
+   ```
+
+## Résultat attendu
+
+- Pour chaque modèle listé, le script affiche :
+  - `Factory NomDuModele OK` si la fabrique retourne bien une instance du modèle.
+  - `Appel NomDuModele::getAll() OK` si la méthode principale fonctionne et retourne un tableau.
+- Si un modèle n’existe pas ou n’implémente pas l’interface, un message d’erreur s’affiche.
+
+## Pré-requis
+
+- Tous les modèles doivent implémenter l’interface `ModelInterface`.
+- Les fichiers modèles doivent être présents dans le dossier `models/`.

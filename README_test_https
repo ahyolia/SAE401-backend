@@ -1,0 +1,19 @@
+# Test HTTPS
+
+Ce script vérifie si votre serveur Apache/WAMP est bien configuré en HTTPS.
+
+## Utilisation
+
+1. Placez `test_https.php` à la racine de votre projet (ex : `C:/wamp64/www/SAE401/test_https.php`).
+2. Accédez à la page dans votre navigateur :
+   - http://localhost/SAE401/test_https.php (HTTP)
+   - https://localhost/SAE401/test_https.php (HTTPS)
+
+## Résultat attendu
+
+- Si la connexion est en HTTPS, le script affiche :
+  - "You are securely connected via HTTPS."
+  - Les informations du certificat (Common Name, Issuer, Valid To)
+- Si la connexion est en HTTP, un message d’avertissement s’affiche.
+
+> ⚠️ En local, un certificat auto-signé affichera toujours "connexion non sécurisée" dans le navigateur, mais la connexion est bien chiffrée.
