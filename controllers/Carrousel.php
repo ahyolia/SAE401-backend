@@ -19,17 +19,17 @@ class Carrousel extends \app\Controller {
     
      // GET /api/carrousel
 
-    public function index($api = false): mixed {
-        $carrousel = $this->carrouselModel->getAll();
+    public function index($api = false) {
+        $this->loadModel('Carrousel');
+        $carrouselPartenaires = $this->Carrousel->getAll();
         if ($api) {
-            // Ajoute le chemin complet pour chaque image
-            foreach ($carrousel as &$item) {
-                if (!empty($item['image']) && strpos($item['image'], 'http') !== 0) {
-                    $item['image'] = 'http://localhost/SAE401/' . ltrim($item['image'], '/');
+            foreach ($carrouselPartenaires as &$p) {
+                if (!empty($p['image']) && strpos($p['image'], 'http') !== 0) {
+                    $p['image'] = 'http://localhost/SAE401/images/' . ltrim($p['image'], '/');
                 }
             }
             header('Content-Type: application/json');
-            echo json_encode($carrousel);
+            echo json_encode($carrouselPartenaires);
             return null;
         }
         return $this->render('index', compact('carrousel'), $api);

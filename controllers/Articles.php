@@ -16,12 +16,12 @@ use app\ModelFactory;
         public function index($api=false): mixed{
             $this->loadModel('Articles');
             $articles = $this->Articles->getAll();
-            foreach ($articles as &$article) {
-                if (!empty($article['image']) && strpos($article['image'], 'http') !== 0) {
-                    $article['image'] = 'http://localhost/SAE401/' . ltrim($article['image'], '/');
-                }
-            }
             if ($api) {
+                foreach ($articles as &$article) {
+                    if (!empty($article['image']) && strpos($article['image'], 'http') !== 0) {
+                        $article['image'] = 'http://localhost/SAE401/images/' . ltrim($article['image'], '/');
+                    }
+                }
                 header('Content-Type: application/json');
                 echo json_encode($articles);
                 return null;
