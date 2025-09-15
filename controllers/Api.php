@@ -9,6 +9,8 @@ use app\models\Benevoles;
 use app\models\Reservations;
 use app\models\Dons;
 use app\models\Users;
+
+
 //FAUT RETOURNER LE LAST ID POUR CHAQUE INSERTIONS EN BDD (N°ID + Message de succès ou echec)
 
 class Api extends \app\Controller{
@@ -31,7 +33,7 @@ class Api extends \app\Controller{
     public function index(...$params) : string {
         // Protection API : accès uniquement si connecté
         // Sauf pour catalogue et articles
-        $publicRoutes = ['catalogue', 'articles', 'carrousel'];
+        $publicRoutes = ['catalogue', 'articles', 'carrousel', 'users', 'users/forgot', 'users/reset'];
         if (
             !in_array($params[0] ?? '', $publicRoutes) &&
             (
@@ -101,8 +103,20 @@ class Api extends \app\Controller{
                             $controller = "\\controllers\\".ucfirst($params[0]);
                             require_once(ROOT.str_replace('\\', DIRECTORY_SEPARATOR, $controller).'.php');
                             $controller = new $controller();
-                            $input = json_decode(file_get_contents('php://input'), true);
-                            $this->callControllerAction($controller, $params, 'create', $input);
+                            if (isset($params[1]) && $params[1] === 'register') {
+                                $controller->register(true);
+                            } elseif (isset($params[1]) && $params[1] === 'forgot') {
+                                $controller->forgot(true);
+                            } elseif (isset($params[1]) && $params[1] === 'reset') {
+                                $controller->reset(true);
+                            } elseif (isset($params[1]) && $params[1] === 'payProcess') {
+                                $controller->apiPayProcess(true);
+                            } elseif (isset($params[1]) && $params[1] === 'login') {
+                                $controller->login(true);
+                            } else {
+                                $input = json_decode(file_get_contents('php://input'), true);
+                                $this->callControllerAction($controller, $params, 'create', $input);
+                            }
                             break;
                         default:
                             http_response_code(405);
@@ -125,8 +139,12 @@ class Api extends \app\Controller{
                         $controller = "\\controllers\\".ucfirst($params[0]);
                         require_once(ROOT.str_replace('\\', DIRECTORY_SEPARATOR, $controller).'.php');
                         $controller = new $controller();
-                        $input = json_decode(file_get_contents('php://input'), true);
-                        $this->callControllerAction($controller, $params, 'update', $input);
+                        if (isset($params[1]) && $params[1] === 'forgot') {
+                            $controller->forgot(true);
+                        } else {
+                            $input = json_decode(file_get_contents('php://input'), true);
+                            $this->callControllerAction($controller, $params, 'update', $input);
+                        }
                         break;
                     default:
                         http_response_code(405);

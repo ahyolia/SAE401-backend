@@ -1,0 +1,21 @@
+TO: camhdyo@gmail.com
+SUBJECT: Réinitialisation de votre mot de passe
+MESSAGE: Bonjour,
+
+Pour réinitialiser votre mot de passe, cliquez sur ce lien : http://tonsite/reset?token=e1e1461d52329dacbc9f1925e6506e056294116b656447418da89f5c3964aeaa
+
+Ce lien est valable 1 heure.
+TO: camhdyo@gmail.com
+SUBJECT: Réinitialisation de votre mot de passe
+MESSAGE: Bonjour,
+
+Pour réinitialiser votre mot de passe, cliquez sur ce lien : http://tonsite/reset?token=c3f3d9857b59fc8840990125773a9fa24f2ca18a0bd45ff64dc85e699acf1987
+
+Ce lien est valable 1 heure.
+TO: camhdyo@gmail.com
+SUBJECT: Réinitialisation de votre mot de passe
+MESSAGE: Bonjour,
+
+Pour réinitialiser votre mot de passe, cliquez sur ce lien : http://localhost:4200/reset?token=116b614228534a248030f4da4feacb903a148c66131131ab720b696b30a2b22b
+
+Ce lien est valable 1 heure.

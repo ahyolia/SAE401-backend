@@ -14,23 +14,21 @@ class Users extends \app\Model implements ModelInterface {
 
      // Inscription d'un nouvel utilisateur
     public function register($data) {
-        $sql = "INSERT INTO users (email, password, role, numero_etudiant, nom, prenom, adherent, '')
+        $sql = "INSERT INTO users (email, password, role, numero_etudiant, nom, prenom, adherent)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
-            $emptyToken = '';
-            $stmt = $this->getConnection()->prepare($sql);
-            $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
-            $stmt->bind_param(
-                "ssssssis",
-                $data['email'],
-                $hashed,
-                $data['role'],
-                $data['numero_etudiant'],
-                $data['nom'],
-                $data['prenom'],
-                $data['adherent'],
-                $emptyToken
-            );
-            return $stmt->execute();
+        $stmt = $this->getConnection()->prepare($sql);
+        $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
+        $stmt->bind_param(
+            "ssssssi",
+            $data['email'],
+            $hashed,
+            $data['role'],
+            $data['numero_etudiant'],
+            $data['nom'],
+            $data['prenom'],
+            $data['adherent']
+        );
+        return $stmt->execute();
     }
 
        // Trouver un utilisateur par email ou username (pour la connexion)
@@ -100,6 +98,30 @@ class Users extends \app\Model implements ModelInterface {
     $stmt->bind_param("i", $id);
     return $stmt->execute();
 }
+
+    public function setResetToken($userId, $token, $expire) {
+        $sql = "UPDATE `{$this->table}` SET reset_token = ?, reset_token_expire = ? WHERE id = ?";
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bind_param("ssi", $token, $expire, $userId);
+        return $stmt->execute();
+    }
+
+    public function findByResetToken($token) {
+        $sql = "SELECT * FROM `{$this->table}` WHERE reset_token = ?";
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+
+    public function resetPassword($userId, $password) {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "UPDATE `{$this->table}` SET password = ?, reset_token = NULL, reset_token_expire = NULL WHERE id = ?";
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bind_param("si", $hash, $userId);
+        return $stmt->execute();
+    }
 
 }
 ?>

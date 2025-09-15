@@ -136,6 +136,7 @@ class Users extends \app\Controller {
             }
             $user = $userModel->findByLogin($login);
             if ($user && password_verify($password, $user['password'])) {
+                // Connexion OK
                 $token = bin2hex(random_bytes(32));
                 $userModel->updateToken($user['email'], $token);
                 $expire = time() + 3600;
@@ -148,6 +149,11 @@ class Users extends \app\Controller {
                     'token' => $token,
                     'token_expire' => $expire
                 ];
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'user' => $_SESSION['user']]);
+                    return;
+                }
                 header('Location: /');
                 exit;
             } else {
@@ -340,6 +346,131 @@ class Users extends \app\Controller {
                 return;
             }
             echo 'Erreur lors de la suppression du compte.';
+        }
+    }
+    // POST /api/users/forgot
+
+    public function forgot($api = false): void {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->loadModel('Users');
+                $data = $_POST;
+                if (empty($data)) {
+                    $data = json_decode(file_get_contents('php://input'), true);
+                }
+                $email = $data['email'] ?? '';
+                if (empty($email)) {
+                    if ($api) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => false, 'message' => 'Email requis.']);
+                        return;
+                    }
+                    echo 'Email requis.';
+                    return;
+                }
+                $user = $this->Users->findByLogin($email);
+                if (!$user) {
+                    if ($api) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true, 'message' => 'Si ce compte existe, un email a été envoyé.']);
+                        return;
+                    }
+                    echo 'Si ce compte existe, un email a été envoyé.';
+                    return;
+                }
+                // Génère un token unique et une date d’expiration
+                $token = bin2hex(random_bytes(32));
+                $expire = date('Y-m-d H:i:s', time() + 3600); // 1h de validité
+
+                // Stocke le token et l’expiration en BDD
+                $this->Users->setResetToken($user['id'], $token, $expire);
+
+                // Envoie l’email
+                // Pour un environnement local Angular (ex: localhost:4200)
+                $resetLink = "http://localhost:4200/reset?token=$token";
+                $subject = "Réinitialisation de votre mot de passe";
+                $message = "Bonjour,\n\nPour réinitialiser votre mot de passe, cliquez sur ce lien : $resetLink\n\nCe lien est valable 1 heure.";
+                file_put_contents('mail_debug.txt', "TO: {$user['email']}\nSUBJECT: $subject\nMESSAGE: $message\n", FILE_APPEND);
+                // mail($user['email'], $subject, $message); // (désactive l'envoi réel)
+
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => 'Si ce compte existe, un email a été envoyé.']);
+                    return;
+                }
+                echo 'Si ce compte existe, un email a été envoyé.';
+            }
+        } catch (\Throwable $e) {
+            if ($api) {
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()]);
+                return;
+            }
+            echo 'Erreur serveur : ' . $e->getMessage();
+        }
+    }
+    // POST /api/users/reset
+    public function reset($api = false): void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->loadModel('Users');
+            $data = $_POST;
+            if (empty($data)) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
+            $token = $data['token'] ?? '';
+            $password = $data['password'] ?? '';
+
+            if (empty($token) || empty($password)) {
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Token et mot de passe requis.']);
+                    return;
+                }
+                echo 'Token et mot de passe requis.';
+                return;
+            }
+
+            $user = $this->Users->findByResetToken($token);
+            if (!$user) {
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Lien invalide ou expiré.']);
+                    return;
+                }
+                echo 'Lien invalide ou expiré.';
+                return;
+            }
+
+            // Vérifie la validité du token
+            if (strtotime($user['reset_token_expire']) < time()) {
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Lien expiré.']);
+                    return;
+                }
+                echo 'Lien expiré.';
+                return;
+            }
+
+            // Met à jour le mot de passe et invalide le token
+            $success = $this->Users->resetPassword($user['id'], $password);
+
+            if ($success) {
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => 'Mot de passe réinitialisé avec succès.']);
+                    return;
+                }
+                echo 'Mot de passe réinitialisé avec succès.';
+            } else {
+                if ($api) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => 'Erreur lors de la réinitialisation.']);
+                    return;
+                }
+                echo 'Erreur lors de la réinitialisation.';
+            }
         }
     }
 }
