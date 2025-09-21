@@ -9,7 +9,7 @@ use app\models\Benevoles;
 use app\models\Reservations;
 use app\models\Dons;
 use app\models\Users;
-
+use app\models\Panier;
 
 //FAUT RETOURNER LE LAST ID POUR CHAQUE INSERTIONS EN BDD (N°ID + Message de succès ou echec)
 
@@ -33,7 +33,7 @@ class Api extends \app\Controller{
     public function index(...$params) : string {
         // Protection API : accès uniquement si connecté
         // Sauf pour catalogue et articles
-        $publicRoutes = ['catalogue', 'articles', 'carrousel', 'users', 'users/forgot', 'users/reset'];
+        $publicRoutes = ['catalogue', 'articles', 'carrousel', 'users', 'users/forgot', 'users/reset', 'panier'];
         if (
             !in_array($params[0] ?? '', $publicRoutes) &&
             (
@@ -81,8 +81,19 @@ class Api extends \app\Controller{
                             $controller = "\\controllers\\".ucfirst($params[0]);
                             require_once(ROOT.str_replace('\\', DIRECTORY_SEPARATOR, $controller).'.php');
                             $controller = new $controller();
-                            $this->callControllerAction($controller, $params, 'index', true);
+                            if (isset($params[1]) && $params[1] === 'edit') {
+                                $controller->edit(true);
+                            } elseif (isset($params[1]) && $params[1] === 'account') {
+                                $controller->account(true);
+                            } else {
+                                $this->callControllerAction($controller, $params, 'index', true);
+                            }
                             break;
+                            case 'panier':
+                                require_once(ROOT.'controllers/Panier.php');
+                                $controller = new \controllers\Panier();
+                                $controller->apiGet(true);
+                                break;
                             default:
                             http_response_code(405);
                             echo json_encode(['message' => 'Méthode non autorisée']);
@@ -103,20 +114,28 @@ class Api extends \app\Controller{
                             $controller = "\\controllers\\".ucfirst($params[0]);
                             require_once(ROOT.str_replace('\\', DIRECTORY_SEPARATOR, $controller).'.php');
                             $controller = new $controller();
-                            if (isset($params[1]) && $params[1] === 'register') {
-                                $controller->register(true);
+                            if (isset($params[1]) && $params[1] === 'login') {
+                                $controller->login(true);
                             } elseif (isset($params[1]) && $params[1] === 'forgot') {
                                 $controller->forgot(true);
                             } elseif (isset($params[1]) && $params[1] === 'reset') {
                                 $controller->reset(true);
                             } elseif (isset($params[1]) && $params[1] === 'payProcess') {
                                 $controller->apiPayProcess(true);
-                            } elseif (isset($params[1]) && $params[1] === 'login') {
-                                $controller->login(true);
-                            } else {
+                            } elseif (isset($params[1]) && $params[1] === 'register') {
+                                $controller->register(true);
+                            } elseif (isset($params[1]) && $params[1] === 'update') {
+                                $controller->apiUpdate(true);
+                            }
+                            else {
                                 $input = json_decode(file_get_contents('php://input'), true);
                                 $this->callControllerAction($controller, $params, 'create', $input);
                             }
+                            break;
+                        case 'panier':
+                            require_once(ROOT.'controllers/Panier.php');
+                            $controller = new \controllers\Panier();
+                            $controller->apiPost(true);
                             break;
                         default:
                             http_response_code(405);
@@ -146,6 +165,11 @@ class Api extends \app\Controller{
                             $this->callControllerAction($controller, $params, 'update', $input);
                         }
                         break;
+                    case 'panier':
+                        require_once(ROOT.'controllers/Panier.php');
+                        $controller = new \controllers\Panier();
+                        $controller->apiPut(true);
+                        break;
                     default:
                         http_response_code(405);
                         echo json_encode(['message' => 'Méthode non autorisée']);
@@ -168,6 +192,11 @@ class Api extends \app\Controller{
                         $controller = new $controller();
                         $id = isset($params[1]) ? $params[1] : null;
                         $this->callControllerAction($controller, $params, 'delete', $id);
+                        break;
+                    case 'panier':
+                        require_once(ROOT.'controllers/Panier.php');
+                        $controller = new \controllers\Panier();
+                        $controller->apiDelete(true);
                         break;
                     default:
                         http_response_code(405);    

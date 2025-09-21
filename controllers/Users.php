@@ -136,11 +136,10 @@ class Users extends \app\Controller {
             }
             $user = $userModel->findByLogin($login);
             if ($user && password_verify($password, $user['password'])) {
-                // Connexion OK
                 $token = bin2hex(random_bytes(32));
                 $userModel->updateToken($user['email'], $token);
                 $expire = time() + 3600;
-                setcookie('token', $token, $expire, '/');
+                setcookie('token', $token, $expire, '/', '', false, true); // Ajoute le flag HttpOnly
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'prenom' => $user['prenom'],
@@ -279,7 +278,7 @@ class Users extends \app\Controller {
         $this->requireUser();
         $this->loadModel('Users');
         $userId = $_SESSION['user']['id'];
-        $this->Users->setAdherent($userId);
+        $this->Users->setAdherent($userId); // Met à jour la BDD
         $_SESSION['user']['adherent'] = 1;
         $msg = "Paiement réussi, vous êtes maintenant adhérent !";
         if ($api) {
@@ -298,18 +297,17 @@ class Users extends \app\Controller {
     public function apiAccount($api = false): void {
         $this->requireUser();
         $this->loadModel('Reservations');
+        $this->loadModel('Dons');
         $reservations = $this->Reservations->getByUser($_SESSION['user']['id']);
+        $dons = $this->Dons->getByUserId($_SESSION['user']['id']);
         $user = $_SESSION['user'];
         $data = [
             'user' => $user,
-            'reservations' => $reservations
+            'reservations' => $reservations,
+            'dons' => $dons
         ];
-        if ($api) {
-            header('Content-Type: application/json');
-            echo json_encode($data);
-            return;
-        }
-        $this->render('account', $data);
+        header('Content-Type: application/json');
+        echo json_encode($data);
     }
     // Page de compte utilisateur (frontend)
 
@@ -321,6 +319,15 @@ class Users extends \app\Controller {
         $userId = $user['id'];
         $reservations = $this->Reservations->getByUserId($userId);
         $dons = $this->Dons->getByUserId($userId);
+        if ($api) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'user' => $user,
+                'reservations' => $reservations,
+                'dons' => $dons
+            ]);
+            return;
+        }
         $this->render('account', compact('user', 'reservations', 'dons'));
     }
 

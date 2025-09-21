@@ -4,11 +4,6 @@ namespace controllers;
 use app\ModelFactory;
 
 class Panier extends \app\Controller {
-    protected $panierModel;
-
-    public function __construct() {
-        $this->panierModel = ModelFactory::create('Panier');
-    }
 
     public function index($api = false): mixed {
         // Affichage du panier : public
@@ -97,14 +92,8 @@ class Panier extends \app\Controller {
 
         // Si tout est OK, on crée la réservation
         $reservationId = $this->Reservations->add($userId, $date);
-
-        if (!$reservationId) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Erreur lors de la création de la réservation.']);
-            return;
-        }
-
         foreach ($data as $item) {
+            error_log("Ajout produit à la réservation: res=$reservationId, prod={$item['id']}, qty={$item['quantity']}");
             $this->Reservations->addProduit($reservationId, $item['id'], $item['quantity']);
         }
 
@@ -127,6 +116,75 @@ class Panier extends \app\Controller {
         }
         header('Content-Type: application/json');
         echo json_encode($stocks);
+    }
+
+    // GET /api/panier
+    public function apiGet($api = false): void {
+        $this->requireUser();
+        $this->loadModel('Panier');
+        $userId = $_SESSION['user']['id'];
+        $panier = $this->Panier->getByUser($userId);
+        header('Content-Type: application/json');
+        echo json_encode(['panier' => $panier]);
+    }
+
+    // POST /api/panier
+    public function apiPost($api = false): void {
+        $this->requireUser();
+        $this->loadModel('Panier');
+        $userId = $_SESSION['user']['id'];
+        $data = json_decode(file_get_contents('php://input'), true);
+        $success = $this->Panier->save($userId, $data);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
+    }
+
+    // PUT /api/panier
+    public function apiPut($api = false): void {
+        $this->requireUser();
+        $this->loadModel('Panier');
+        $userId = $_SESSION['user']['id'];
+        $data = json_decode(file_get_contents('php://input'), true);
+        $success = $this->Panier->update($userId, $data);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
+    }
+
+    // DELETE /api/panier
+    public function apiDelete($api = false): void {
+        $this->requireUser();
+        $this->loadModel('Panier');
+        $userId = $_SESSION['user']['id'];
+        $success = $this->Panier->delete($userId);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
+    }
+
+    public function requireUser() {
+        if (
+            empty($_SESSION['user']) ||
+            empty($_SESSION['user']['token']) ||
+            empty($_SESSION['user']['token_expire']) ||
+            $_SESSION['user']['token_expire'] < time() ||
+            empty($_COOKIE['token']) ||
+            $_SESSION['user']['token'] !== $_COOKIE['token']
+        ) {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Votre session a expirée. Veuillez vous reconnecter.']);
+            exit;
+        }
+    }
+
+    public function getByUser($userId) {
+        $sql = "SELECT produits FROM panier WHERE user_id = ?";
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        error_log('Lecture panier BDD: ' . print_r($row, true));
+        return $row ? json_decode($row['produits'], true) : [];
     }
 }
 ?>

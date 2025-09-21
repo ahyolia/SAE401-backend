@@ -133,7 +133,8 @@ document.getElementById('btn-valider').addEventListener('click', () => {
         fetch('/panier/valider', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(panier)
+            body: JSON.stringify(panier),
+            credentials: 'include' 
         })
         .then(res => res.json())
         .then(data => {
@@ -224,4 +225,53 @@ function updateCartCount() {
     if (cartCount) {
         cartCount.textContent = panierLS.reduce((total, item) => total + item.quantity, 0);
     }
+}
+
+// Fonction pour ajouter un produit au panier
+function ajouterAuPanier(produit) {
+    const index = panier.findIndex(p => p.id === produit.id);
+    if (index !== -1) {
+        // Le produit est déjà dans le panier, on met juste à jour la quantité
+        panier[index].quantity += produit.quantity;
+    } else {
+        // Le produit n'est pas dans le panier, on l'ajoute
+        panier.push(produit);
+    }
+    localStorage.setItem('panier', JSON.stringify(panier));
+    afficherPanier();
+}
+
+// Exemple d'utilisation : ajouter un produit avec ID 123 au panier
+// ajouterAuPanier({ id: 123, name: 'Produit 123', quantity: 1, price: 10.99, image: '/images/produit123.png' });
+
+// Fonction pour valider le panier et envoyer les données au serveur
+function validerPanier() {
+    const panier = JSON.parse(localStorage.getItem('panier')) || [];
+    if (panier.length === 0) {
+        alert('Votre panier est vide.');
+        return;
+    }
+
+    // Ici, vous pouvez ajouter des vérifications supplémentaires si nécessaire
+
+    fetch('/panier/valider', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(panier),
+        credentials: 'include' // <-- Obligatoire !
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Votre commande a été validée avec succès !');
+            localStorage.removeItem('panier');
+            afficherPanier();
+        } else {
+            alert('Erreur lors de la validation de la commande : ' + (data.message || 'Inconnue'));
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la validation du panier :', error);
+        alert('Une erreur est survenue. Veuillez réessayer plus tard.');
+    });
 }

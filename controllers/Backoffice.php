@@ -1,13 +1,10 @@
 <?php
 
-namespace controllers; 
+namespace controllers;
+
 use app\ModelFactory;
 
 class Backoffice extends \app\Controller {  
-    protected $backofficeModel;
-    public function __construct() {
-        $this->backofficeModel = ModelFactory::create('Backoffice');
-    }
 
     private function requireAdmin() {
         if (!isset($_SESSION['connecte'])) {
