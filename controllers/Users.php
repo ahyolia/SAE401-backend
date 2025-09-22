@@ -317,7 +317,7 @@ class Users extends \app\Controller {
         $this->loadModel('Dons');
         $user = $_SESSION['user'];
         $userId = $user['id'];
-        $reservations = $this->Reservations->getByUserId($userId);
+        $reservations = $this->Reservations->getByUser($userId);
         $dons = $this->Dons->getByUserId($userId);
         if ($api) {
             header('Content-Type: application/json');
@@ -330,7 +330,6 @@ class Users extends \app\Controller {
         }
         $this->render('account', compact('user', 'reservations', 'dons'));
     }
-
 
     public function deleteAccount($api = false): void {
         $this->requireUser();

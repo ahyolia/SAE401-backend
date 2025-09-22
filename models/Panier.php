@@ -14,6 +14,7 @@ class Panier extends \app\Model {
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
+        error_log('Lecture panier BDD: ' . print_r($row, true));
         return $row ? json_decode($row['produits'], true) : [];
     }
 

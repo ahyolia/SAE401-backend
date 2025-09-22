@@ -124,6 +124,7 @@ class Panier extends \app\Controller {
         $this->loadModel('Panier');
         $userId = $_SESSION['user']['id'];
         $panier = $this->Panier->getByUser($userId);
+        error_log('API GET panier: user_id=' . $userId . ' panier=' . print_r($panier, true));
         header('Content-Type: application/json');
         echo json_encode(['panier' => $panier]);
     }

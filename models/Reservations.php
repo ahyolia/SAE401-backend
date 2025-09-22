@@ -52,6 +52,7 @@ class Reservations extends \app\Model implements ModelInterface {
                 GROUP BY r.id
                 ORDER BY r.date DESC";
         $result = $this->getConnection()->query($sql);
+        error_log('Reservations API: ' . print_r($result->fetch_all(MYSQLI_ASSOC), true));
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -78,11 +79,11 @@ class Reservations extends \app\Model implements ModelInterface {
     }
 
     public function getByUser($userId) {
-        $sql = "SELECT r.*, 
-                   GROUP_CONCAT(CONCAT(p.name, ' (x', rp.quantite, ')') SEPARATOR ', ') as produits
+        $sql = "SELECT r.id, r.user_id, r.date, r.statut,
+                   GROUP_CONCAT(CONCAT(p.name, ' (x', rp.quantite, ')') SEPARATOR ', ') AS produits
             FROM reservations r
-            JOIN reservation_produits rp ON rp.reservation_id = r.id
-            JOIN produits p ON p.id = rp.produit_id
+            LEFT JOIN reservation_produits rp ON rp.reservation_id = r.id
+            LEFT JOIN produits p ON p.id = rp.produit_id
             WHERE r.user_id = ?
             GROUP BY r.id
             ORDER BY r.date DESC";
