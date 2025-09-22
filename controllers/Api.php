@@ -33,7 +33,7 @@ class Api extends \app\Controller{
     public function index(...$params) : string {
         // Protection API : accès uniquement si connecté
         // Sauf pour catalogue et articles
-        $publicRoutes = ['catalogue', 'articles', 'carrousel', 'users', 'users/forgot', 'users/reset', 'panier'];
+        $publicRoutes = ['catalogue', 'articles', 'carrousel', 'users', 'users/forgot', 'users/reset', 'panier', 'categories'];
         if (
             !in_array($params[0] ?? '', $publicRoutes) &&
             (
@@ -126,8 +126,9 @@ class Api extends \app\Controller{
                                 $controller->register(true);
                             } elseif (isset($params[1]) && $params[1] === 'update') {
                                 $controller->apiUpdate(true);
-                            }
-                            else {
+                            } elseif (isset($params[1]) && $params[1] === 'logout') {
+                                $controller->logout(true);
+                            } else {
                                 $input = json_decode(file_get_contents('php://input'), true);
                                 $this->callControllerAction($controller, $params, 'create', $input);
                             }

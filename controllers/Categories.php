@@ -1,6 +1,7 @@
 <?php
 namespace controllers;
 
+require_once __DIR__ . '/../app/ModelFactory.php';
 use app\ModelFactory;
 
 class Categories extends \app\Controller {
